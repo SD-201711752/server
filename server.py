@@ -43,7 +43,7 @@ def estado():
         verifica = True
         thr.start()
         value = 200
-    return jsonify({"ocupado": verifica}), return_code
+    return jsonify({"ocupado": verifica}), value
 
 
 def respFunc():
