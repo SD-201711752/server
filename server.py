@@ -1,9 +1,8 @@
-import time
 from flask import Flask, jsonify, request
 from threading import Thread
-import json
-import os
 import threading
+import time
+import os
 
 
 app = Flask(__name__)
@@ -15,7 +14,7 @@ def get_json():
     return jsonify({
         "componente": "server",
         "versao": "0.1",
-        "descricao": "serve os clientes com os serviços X, Y e Z",
+        "descricao": "serve os clientes com os servicos X, Y e Z",
         "ponto_de_acesso": "https://meu-app-sd.heroku.com",
         "status": "up",
         "identificacao": 2,
@@ -39,11 +38,11 @@ def estado():
     global verifica
     thr = threading.Thread(target=respFunc, args=())
     if verifica:
-        return_code = 409
+        value = 409
     else:
         verifica = True
         thr.start()
-        return_code = 200
+        value = 200
     return jsonify({"ocupado": verifica}), return_code
 
 
