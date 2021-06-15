@@ -6,6 +6,6 @@ WORKDIR /app
 
 RUN pip install -e .
 
-ENTRYPOINT 'server_docker'
+ENTRYPOINT ["server_docker"]
 
-EXPOSE 2003
+CMD ["$PORT"]
