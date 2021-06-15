@@ -36,6 +36,8 @@ def get_json():
 @app.route('/recurso', methods=['GET', 'POST'])
 def estado():
     global verifica
+    if request.method == 'GET':
+        return jsonify({"ocupado": verifica})
     thr = threading.Thread(target=respFunc, args=())
     if verifica:
         value = 409
@@ -46,6 +48,19 @@ def estado():
     return jsonify({"ocupado": verifica}), value
 
 
+@app.route('/eleicao', methods=['GET', 'POST'])
+def funEleicao():
+    if request.method == 'GET':
+        return jsonify({
+            "tipo_de_eleicao_ativa": "valentao",
+            "eleicao_em_andamento": False
+        })
+    elif request.method == 'POST':
+        return jsonify({
+            "id": "algum_id_como_string"
+        })
+
+   
 def respFunc():
     global verifica
     time.sleep(10)
