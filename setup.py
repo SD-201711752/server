@@ -6,7 +6,7 @@ setup(
     author='Diego',
     description='',
     license='GNU',
-    install_requires='flask',
+    install_requires=['flask','requests'],
     entry_points={
         'console_scripts': [
             'server_docker=server:main'
