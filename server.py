@@ -124,7 +124,7 @@ def funEleicao():
                                   json={"coordenador": dadosCoordenador["coordenador"],
                                         "id_eleicao": auxiliar})
             dadosEleicao["eleicao_em_andamento"] = False
-        return jsonify()
+        return jsonify({"id": auxiliar})
 
 
 @app.route('/eleicao/coordenador', methods=['POST'])
@@ -142,20 +142,12 @@ def respFunc():
     verifica = False
 
 
-def valentao(url):
+def valentao(target):
     global competicao, info, auxiliar
-
-    dados = requests.get(url + "/info").json()
-    try:
-        if dados["identificacao"] > info["identificacao"]:
-            competicao = True
-            requests.post(url + "/eleicao", json={"id": auxiliar})
-    except requests.ConnectionError:
-        pass
-    except KeyError:
-        pass
-    except TypeError:
-        pass
+    dados = requests.get(target + '/info').json()
+    if dados["identificacao"] > info["identificacao"]:
+        competicao = True
+        requests.post(target + "/eleicao", json={"id": auxiliar})
 
 
 def main():
