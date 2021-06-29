@@ -117,6 +117,7 @@ def funEleicao():
                 for servidor in info["servidores_conhecidos"]:
                     listaThr.append(threading.Thread(target=valentao, args=(servidor["url"],)))
                     listaThr[-1].start()
+                    time.sleep(1)
                 for i in range(len(listaThr)):
                     listaThr[i].join()
                 if competicao is False:
@@ -144,10 +145,17 @@ def respFunc():
 
 def valentao(target):
     global competicao, info, auxiliar
-    dados = requests.get(target + '/info').json()
-    if dados["identificacao"] > info["identificacao"]:
-        competicao = True
-        requests.post(target + "/eleicao", json={"id": auxiliar})
+    resp = requests.get(target + "/info")
+    dados = resp.json()
+    try:
+        if dados["identificacao"] > info["identificacao"]:
+            competicao = True
+            requests.post(target + "/eleicao", json={"id": auxiliar})
+            print("Perdeu para '%s' [%d]" % (target, dados["identificacao"]))
+    except requests.ConnectionError:
+        pass
+    except KeyError:
+        pass
 
 
 def main():
