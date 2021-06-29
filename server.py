@@ -34,11 +34,11 @@ info = {
         },
         {
             "id": 4,
-            "url": "https://sd-jhsq.herokuapp.com/"
+            "url": "https://sd-jhsq.herokuapp.com"
         },
         {
             "id": 5,
-            "url": "https://sd-app-server-jesulino.herokuapp.com/"
+            "url": "https://sd-app-server-jesulino.herokuapp.com"
         }
     ]
 }
@@ -88,7 +88,6 @@ def funInfo():
 def estado():
     global verifica
     if request.method == 'GET':
-        verifica = False
         operacao = 200
         return jsonify({"ocupado": verifica}), operacao
     elif request.method == 'POST':
@@ -108,7 +107,7 @@ def funEleicao():
     competicao = False
     listaThr = []
     if request.method == 'GET':
-        return jsonify(info)
+        return jsonify(dadosEleicao)
     elif request.method == 'POST':
         auxiliar = request.json["id"]
         if not dadosEleicao["eleicao_em_andamento"]:
