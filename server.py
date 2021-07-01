@@ -3,6 +3,7 @@ import requests
 import threading
 import time
 
+from operator import itemgetter
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
@@ -123,16 +124,58 @@ def funEleicao():
                     requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                   json={"coordenador": dadosCoordenador["coordenador"],
                                         "id_eleicao": auxiliar})
+            elif dadosEleicao["tipo_de_eleicao_ativa"] == "anel":
+                id_list = []
+                i = 0
+                for servidor in info["servidores_conhecidos"]:
+                    id_list.append((servidor["url"], -1))
+                    listaThr.append(threading.Thread(target=anel, args=(servidor["url"], id_list, i)))
+                    listaThr[-1].start()
+                    i += 1
+                for i in range(len(listaThr)):
+                    listaThr[i].join()
+                id_list.sort(key=itemgetter(1))
+                for server_id in id_list:
+                    if server_id[1] > dadosCoordenador["coordenador"]:
+                        requests.post(server_id[0] + "/eleicao", json={"id": auxiliar + '-'
+                                                                             + str(dadosCoordenador["coordenador"])})
+                        return
+                valid_servers = []
+                for server_id in id_list:
+                    if server_id[1] > -1:
+                        valid_servers.append(server_id)
+                if len(valid_servers) == 0:  # ... since all of them failed, set ourselves as the new coordinator
+                    requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
+                                  json={"coordenador": dadosCoordenador["coordenador"], "id_eleicao": auxiliar})
+                else:
+                    requests.post(valid_servers[0][0] + "/eleicao", json={"id": auxiliar + '-' +
+                                                                                str(dadosCoordenador["coordenador"])})
+        else:
+            return jsonify(dadosEleicao), 409
+        if info["lider"]:
             dadosEleicao["eleicao_em_andamento"] = False
         return jsonify({"id": auxiliar})
 
 
-@app.route('/eleicao/coordenador', methods=['POST'])
+@app.route('/eleicao/coordenador', methods=['POST', 'GET'])
 def coord():
+    global dadosCoordenador, dadosEleicao
+    if request.method == 'GET':
+        return jsonify(dadosCoordenador)
+    elif request.method == 'POST':
+        dados = request.get_json()
+        dadosCoordenador["coordenador"] = dados["coordenador"]
+        dadosCoordenador["id_eleicao"] = dados["id_eleicao"]
+        dadosEleicao["eleicao_em_andamento"] = False
+
+        return jsonify(dadosCoordenador)
+
+
+@app.route('/eleicao/reset', methods=['GET'])
+def reset():
     global dadosCoordenador
-    dados = request.get_json()
-    dadosCoordenador["coordenador"] = dados["coordenador"]
-    dadosCoordenador["id_eleicao"] = dados["id_eleicao"]
+    dadosCoordenador["coordenador"] = 0
+    dadosCoordenador["id_eleicao"] = ''
     return jsonify(dadosCoordenador)
 
 
@@ -147,7 +190,7 @@ def valentao(target):
     resp = requests.get(target + "/info")
     dados = resp.json()
     try:
-        if dados["identificacao"] > info["identificacao"]:
+        if dados["identificacao"] > info["identificacao"] and dados["status"] == "up":
             competicao = True
             requests.post(target + "/eleicao", json={"id": auxiliar})
             print("Perdeu para '%s' [%d]" % (target, dados["identificacao"]))
@@ -155,6 +198,26 @@ def valentao(target):
         pass
     except KeyError:
         pass
+
+
+def anel(target, id_list, i):
+    try:
+        dados = requests.get(target + "/info").json()
+        if dados["status"] == "down":
+            print(f"[DEBUG] Server '{target}' is down")
+        elif dados["eleicao"] == "valentao":
+            print(f"[DEBUG] Server '{target}' is using a different election type")
+        else:
+            id_list[i] = (target, dados["identificacao"])
+            print(f"[DEBUG] Server '{target}' is valid")
+            return
+    except requests.ConnectionError:
+        pass
+    except KeyError:
+        pass
+    except TypeError:
+        pass
+    id_list[i] = (target, -1)
 
 
 def main():
