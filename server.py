@@ -140,15 +140,15 @@ def funEleicao():
                         requests.post(server_id[0] + "/eleicao", json={"id": auxiliar + '-'
                                                                              + str(dadosCoordenador["coordenador"])})
                         return
-                valid_servers = []
-                for server_id in id_list:
-                    if server_id[1] > -1:
-                        valid_servers.append(server_id)
-                if len(valid_servers) == 0:  # ... since all of them failed, set ourselves as the new coordinator
+                servidores_validos = []
+                for i in id_list:
+                    if i[1] > -1:
+                        servidores_validos.append(i)
+                if len(servidores_validos) == 0:
                     requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                   json={"coordenador": dadosCoordenador["coordenador"], "id_eleicao": auxiliar})
                 else:
-                    requests.post(valid_servers[0][0] + "/eleicao", json={"id": auxiliar + '-' +
+                    requests.post(servidores_validos[0][0] + "/eleicao", json={"id": auxiliar + '-' +
                                                                                 str(dadosCoordenador["coordenador"])})
         else:
             return jsonify(dadosEleicao), 409
