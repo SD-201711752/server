@@ -9,7 +9,7 @@ from flask import Flask, jsonify, request
 app = Flask(__name__)
 verifica = False
 competicao = False
-global auxiliar
+auxiliar = ""
 
 info = {
     "componente": "server",
@@ -115,15 +115,17 @@ def funEleicao():
             dadosEleicao["eleicao_em_andamento"] = True
             if dadosEleicao["tipo_de_eleicao_ativa"] == "valentao":
                 for servidor in info["servidores_conhecidos"]:
-                    listaThr.append(threading.Thread(target=valentao, args=(servidor["url"],)))
-                    listaThr[-1].start()
+                    valentao(servidor["url"])
                     time.sleep(1)
-                for i in range(len(listaThr)):
-                    listaThr[i].join()
                 if competicao is False:
                     requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                   json={"coordenador": dadosCoordenador["coordenador"],
                                         "id_eleicao": auxiliar})
+                    for servidor in info["servidores_conhecidos"]:
+                        threading.Thread(target=(lambda: requests.post(servidor["url"] + '/eleicao/coordenador',
+                                                                       json={"coordenador": dadosCoordenador[
+                                                                           "coordenador"],
+                                                                             "id_eleicao": auxiliar}))).start()
             elif dadosEleicao["tipo_de_eleicao_ativa"] == "anel":
                 id_list = []
                 i = 0
@@ -149,7 +151,8 @@ def funEleicao():
                                   json={"coordenador": dadosCoordenador["coordenador"], "id_eleicao": auxiliar})
                 else:
                     requests.post(servidores_validos[0][0] + "/eleicao", json={"id": auxiliar + '-' +
-                                                                                str(dadosCoordenador["coordenador"])})
+                                                                                     str(dadosCoordenador[
+                                                                                             "coordenador"])})
         else:
             return jsonify(dadosEleicao), 409
         if info["lider"]:
@@ -159,7 +162,7 @@ def funEleicao():
 
 @app.route('/eleicao/coordenador', methods=['POST', 'GET'])
 def coord():
-    global dadosCoordenador, dadosEleicao
+    global dadosCoordenador, dadosEleicao, info
     if request.method == 'GET':
         return jsonify(dadosCoordenador)
     elif request.method == 'POST':
@@ -167,7 +170,10 @@ def coord():
         dadosCoordenador["coordenador"] = dados["coordenador"]
         dadosCoordenador["id_eleicao"] = dados["id_eleicao"]
         dadosEleicao["eleicao_em_andamento"] = False
-
+        if dadosCoordenador["coordenador"] == info["identificacao"]:
+            info["lider"] = True
+        else:
+            info["lider"] = False
         return jsonify(dadosCoordenador)
 
 
@@ -185,15 +191,15 @@ def respFunc():
     verifica = False
 
 
-def valentao(target):
+def valentao(url):
     global competicao, info, auxiliar
-    resp = requests.get(target + "/info")
+    resp = requests.get(url + "/info")
     dados = resp.json()
     try:
-        if dados["identificacao"] > info["identificacao"] and dados["status"] == "up":
+        if dados["identificacao"] > info["identificacao"] and dados["status"] == "up" and info["eleicao"] == "valentao":
             competicao = True
-            requests.post(target + "/eleicao", json={"id": auxiliar})
-            print("Perdeu para '%s' [%d]" % (target, dados["identificacao"]))
+            requests.post(url + "/eleicao", json={"id": auxiliar})
+            print("Perdeu para '%s' [%d]" % (url, dados["identificacao"]))
     except requests.ConnectionError:
         pass
     except KeyError:
