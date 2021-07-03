@@ -139,9 +139,7 @@ def funEleicao():
     global dadosEleicao, competicao, auxiliar, validos
     cont = 0
     competicao = False
-    if request.method == 'GET':
-        return jsonify(dadosEleicao)
-    elif request.method == 'POST':
+    if request.method == 'POST':
         auxiliar = request.json["id"]
         if not dadosEleicao["eleicao_em_andamento"]:
             dadosEleicao["eleicao_em_andamento"] = True
@@ -176,9 +174,14 @@ def funEleicao():
                     requests.post(validos[0][0] + "/eleicao", json={"id": auxiliar + '-' +
                                                                           str(dadosCoordenador[
                                                                                   "coordenador"])})
+        elif dadosEleicao["eleicao_em_andamento"]:
+            dadosEleicao["eleicao_em_andamento"] = True
+            time.sleep(1)
         else:
             return jsonify(dadosEleicao), 409
         return jsonify({"id": auxiliar})
+    elif request.method == 'GET':
+        return jsonify(dadosEleicao)
 
 
 @app.route('/eleicao/coordenador', methods=['POST', 'GET'])
