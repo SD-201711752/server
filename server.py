@@ -8,6 +8,7 @@ from flask import Flask, jsonify, request
 app = Flask(__name__)
 verifica = False
 competicao = False
+id = 2
 lista = []
 validos = []
 auxiliar = ""
@@ -71,6 +72,7 @@ def funInfo():
         try:
             if type(dados["identificacao"]) == int:
                 info["identificacao"] = dados["identificacao"]
+                dadosCoordenador["coordenador"] = dados["identificacao"]
         except KeyError:
             pass
         try:
