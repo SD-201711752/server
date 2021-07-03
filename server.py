@@ -191,6 +191,7 @@ def coord():
         return jsonify(dadosCoordenador)
     elif request.method == 'POST':
         dados = request.json
+        dadosEleicao["eleicao_em_andamento"] = True
         dadosCoordenador["coordenador"] = dados["coordenador"]
         dadosCoordenador["id_eleicao"] = dados["id_eleicao"]
         time.sleep(1)
