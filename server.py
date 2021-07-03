@@ -51,7 +51,7 @@ dadosEleicao = {
 }
 
 dadosCoordenador = {
-    "coordenador": 2,
+    "coordenador": "",
     "id_eleicao": "o id da eleição"
 }
 
@@ -71,7 +71,6 @@ def funInfo():
         try:
             if type(dados["identificacao"]) == int:
                 info["identificacao"] = dados["identificacao"]
-                dadosCoordenador["coordenador"] = dados["identificacao"]
         except KeyError:
             pass
         try:
@@ -152,11 +151,11 @@ def funEleicao():
                     time.sleep(1)
                 if competicao is False:
                     requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
-                                  json={"coordenador": dadosCoordenador["coordenador"],
+                                  json={"coordenador": info["identificacao"],
                                         "id_eleicao": auxiliar})
                     for servidor in info["servidores_conhecidos"]:
                         requests.post(servidor["url"] + '/eleicao/coordenador',
-                                      json={"coordenador": dadosCoordenador["coordenador"],
+                                      json={"coordenador": info["identificacao"],
                                             "id_eleicao": auxiliar})
             elif dadosEleicao["tipo_de_eleicao_ativa"] == "anel":
                 for servidor in info["servidores_conhecidos"]:
@@ -179,7 +178,6 @@ def funEleicao():
                                                                                   "coordenador"])})
         else:
             return jsonify(dadosEleicao), 409
-        dadosEleicao["eleicao_em_andamento"] = False
         return jsonify({"id": auxiliar})
 
 
@@ -192,18 +190,19 @@ def coord():
         dados = request.json
         dadosCoordenador["coordenador"] = dados["coordenador"]
         dadosCoordenador["id_eleicao"] = dados["id_eleicao"]
-        dadosEleicao["eleicao_em_andamento"] = False
+        time.sleep(1)
         if dadosCoordenador["coordenador"] == info["identificacao"]:
             info["lider"] = True
         else:
             info["lider"] = False
+        dadosEleicao["eleicao_em_andamento"] = False
         return jsonify(dadosCoordenador)
 
 
 @app.route('/reset', methods=['GET'])
 def reset():
     global dadosCoordenador, info
-    dadosCoordenador["coordenador"] = 0
+    dadosCoordenador["coordenador"] = ""
     dadosCoordenador["id_eleicao"] = ''
     info["identificacao"] = 2
     info["lider"] = False
