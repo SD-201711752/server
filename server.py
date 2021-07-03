@@ -8,6 +8,7 @@ from flask import Flask, jsonify, request
 app = Flask(__name__)
 verifica = False
 competicao = False
+id = 2
 lista = []
 validos = []
 auxiliar = ""
@@ -200,12 +201,14 @@ def coord():
         return jsonify(dadosCoordenador)
 
 
-@app.route('/eleicao/reset', methods=['GET'])
+@app.route('/reset', methods=['GET'])
 def reset():
-    global dadosCoordenador
+    global dadosCoordenador, info
     dadosCoordenador["coordenador"] = 0
     dadosCoordenador["id_eleicao"] = ''
-    return jsonify(dadosCoordenador)
+    info["identificacao"] = 2
+    info["lider"] = False
+    return jsonify(info, dadosCoordenador)
 
 
 def respFunc():
