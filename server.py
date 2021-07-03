@@ -1,10 +1,8 @@
 import os
-import json
 import requests
 import threading
 import time
 
-from operator import itemgetter
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
@@ -144,11 +142,10 @@ def funEleicao():
                 for servidor in info["servidores_conhecidos"]:
                     anel(servidor["url"], cont)
                     cont += 1
-                lista.sort(key=itemgetter(1))
-                for server_id in lista:
-                    if server_id[1] > dadosCoordenador["coordenador"]:
-                        requests.post(server_id[0] + "/eleicao", json={"id": auxiliar + '-'
-                                                                             + str(dadosCoordenador["coordenador"])})
+                for servidor in lista:
+                    if servidor[1] > dadosCoordenador["coordenador"]:
+                        requests.post(servidor[0] + "/eleicao", json={"id": auxiliar + '-'
+                                                                            + str(dadosCoordenador["coordenador"])})
                         return
                 servidores_validos = []
                 for i in lista:
