@@ -9,6 +9,7 @@ app = Flask(__name__)
 verifica = False
 competicao = False
 lista = []
+validos = []
 auxiliar = ""
 
 info = {
@@ -73,7 +74,7 @@ def funInfo():
         except KeyError:
             pass
         try:
-            if type(dados["lider"]) == bool:
+            if type(dados["lider"]) == bool or dados["lider"] in [0, 1]:
                 info["lider"] = dados["lider"]
         except KeyError:
             pass
@@ -110,14 +111,32 @@ def valentao(url):
             "eleicao"] == "valentao":
             competicao = True
             requests.post(url + "/eleicao", json={"id": auxiliar})
-            print("Perdeu para '%s' [%d]" % (url, dados["identificacao"]))
+            print("Perdi para '%s' [%d]" % (url, dados["identificacao"]))
+    except TypeError:
+        pass
+
+
+def anel(url, cont):
+    global lista
+    try:
+        dados = requests.get(url + "/info").json()
+        if dados["status"] == "down" or dados["eleicao"] == "valentao":
+            print(f"Servidor: '{url}' invalido")
+        else:
+            lista[cont] = (url, dados["identificacao"])
+            print(f"Servidor '{url}' valido")
+            return
+    except requests.ConnectionError:
+        pass
+    except KeyError:
+        pass
     except TypeError:
         pass
 
 
 @app.route('/eleicao', methods=['GET', 'POST'])
 def funEleicao():
-    global dadosEleicao, competicao, auxiliar
+    global dadosEleicao, competicao, auxiliar, validos
     cont = 0
     competicao = False
     if request.method == 'GET':
@@ -147,17 +166,16 @@ def funEleicao():
                         requests.post(servidor[0] + "/eleicao", json={"id": auxiliar + '-'
                                                                             + str(dadosCoordenador["coordenador"])})
                         return
-                servidores_validos = []
                 for i in lista:
                     if i[1] > -1:
-                        servidores_validos.append(i)
-                if len(servidores_validos) == 0:
+                        validos.append(i)
+                if len(validos) == 0:
                     requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                   json={"coordenador": dadosCoordenador["coordenador"], "id_eleicao": auxiliar})
                 else:
-                    requests.post(servidores_validos[0][0] + "/eleicao", json={"id": auxiliar + '-' +
-                                                                                     str(dadosCoordenador[
-                                                                                             "coordenador"])})
+                    requests.post(validos[0][0] + "/eleicao", json={"id": auxiliar + '-' +
+                                                                          str(dadosCoordenador[
+                                                                                  "coordenador"])})
         else:
             return jsonify(dadosEleicao), 409
         dadosEleicao["eleicao_em_andamento"] = False
@@ -193,24 +211,6 @@ def respFunc():
     global verifica
     time.sleep(10)
     verifica = False
-
-
-def anel(url, cont):
-    global lista
-    try:
-        dados = requests.get(url + "/info").json()
-        if dados["status"] == "down" or dados["eleicao"] == "valentao":
-            print(f"Servidor: '{url}' invalido")
-        else:
-            lista[cont] = (url, dados["identificacao"])
-            print(f"Servidor '{url}' valido")
-            return
-    except requests.ConnectionError:
-        pass
-    except KeyError:
-        pass
-    except TypeError:
-        pass
 
 
 def main():
