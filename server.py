@@ -123,7 +123,7 @@ def anel(url):
     try:
         dados = requests.get(url + "/info").json()
         if dados["status"] == "down" or dados["eleicao"] == "valentao":
-            print(f"Servidor: '{url}' invalido")
+            pass
         else:
             lista.append((url, dados["identificacao"]))
             print(f"Servidor '{url}' valido")
@@ -143,11 +143,6 @@ def funEleicao():
         try:
             cont = 0
             competicao = False
-            print(info["eleicao"])
-            print(estado)
-            print(request.json["id"])
-            print(dadosEleicao["tipo_de_eleicao_ativa"])
-            print(dadosEleicao["tipo_de_eleicao_ativa"] == "anel")
             if not estado:
                 if type(request.json["id"]) is not int:
                     estado = True
