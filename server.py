@@ -7,29 +7,41 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 verifica = False
-competicao = True
+competicao = False
 estado = False
 lista = []
-participantes = []
+validos = []
 auxiliar = ""
 
 info = {
     "componente": "server",
     "versao": "0.1",
     "descricao": "serve os clientes com os servicos disponilizados",
-    "ponto_de_acesso": "http://192.168.0.105:3002",
+    "ponto_de_acesso": "https://sd-dmss.herokuapp.com",
     "status": "up",
-    "identificacao": 3,
+    "identificacao": 2,
     "lider": False,
-    "eleicao": "anel",
+    "eleicao": "valentao",
     "servidores_conhecidos": [
         {
             "id": 1,
-            "url": "http://192.168.0.105:3000"
+            "url": "https://sd-rdm.herokuapp.com"
         },
         {
             "id": 2,
-            "url": "http://192.168.0.105:3001"
+            "url": "https://sd-201620236.herokuapp.com"
+        },
+        {
+            "id": 3,
+            "url": "https://sd-mgs.herokuapp.com"
+        },
+        {
+            "id": 4,
+            "url": "https://sd-jhsq.herokuapp.com"
+        },
+        {
+            "id": 5,
+            "url": "https://sd-app-server-jesulino.herokuapp.com"
         }
     ]
 }
