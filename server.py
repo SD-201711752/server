@@ -7,10 +7,10 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 verifica = False
-competicao = False
+competicao = True
 estado = False
 lista = []
-validos = []
+participantes = []
 auxiliar = ""
 
 info = {
@@ -288,7 +288,7 @@ def coord():
         time.sleep(2)
         estado = False
         return jsonify(dadosCoordenador)
-
+    
 
 @app.route('/reset', methods=['GET'])
 def reset():
@@ -311,7 +311,7 @@ def respFunc():
 
 
 def main():
-    port = int(os.environ.get("PORT", 3002))
+    port = int(os.environ.get("PORT", 3000))
     app.run(host='0.0.0.0', port=port)
 
 
