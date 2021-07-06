@@ -142,66 +142,58 @@ def funEleicao():
             cont = 0
             competicao = False
             if not estado:
-                estado = True
-                if dadosEleicao["tipo_de_eleicao_ativa"] == "valentao":
-                    auxiliar = request.json["id"]
-                    for servidor in info["servidores_conhecidos"]:
-                        valentao(servidor["url"])
-                        time.sleep(1)
-                    if competicao is False:
-                        requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
-                                      json={"coordenador": info["identificacao"],
-                                            "id_eleicao": auxiliar})
+                if type(request.json["id"]) is not int:
+                    estado = True
+                    if dadosEleicao["tipo_de_eleicao_ativa"] == "valentao":
+                        auxiliar = request.json["id"]
                         for servidor in info["servidores_conhecidos"]:
-                            requests.post(servidor["url"] + '/eleicao/coordenador',
+                            valentao(servidor["url"])
+                            time.sleep(1)
+                        if competicao is False:
+                            requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                           json={"coordenador": info["identificacao"],
                                                 "id_eleicao": auxiliar})
-                elif dadosEleicao["tipo_de_eleicao_ativa"] == "anel":
-                    for servidor in info["servidores_conhecidos"]:
-                        anel(servidor["url"])
-                    lista.append((info["ponto_de_acesso"], info["identificacao"]))
-                    listaServidores = sorted(lista, key=lambda x: x[1])
-                    if 'participantes' in request.json:
-                        dados = request.json
-                        participantes.append(dados["participantes"])
-                        participantes.append(info["identificacao"])
-                        for servidor in listaServidores:
-                            cont += 1
-                            if servidor[1] > info["identificacao"]:
-                                requests.post(servidor[0] + "/eleicao",
-                                              json={"id": dados["id"],
-                                                    "participantes": participantes})
-                                break
-                            elif len(listaServidores) == cont and len(listaServidores) > 1:
-                                requests.post(listaServidores[0][0] + "/eleicao",
-                                              json={"id": dados["id"],
-                                                    "participantes": participantes})
-                    else:
-                        auxiliar = request.json["id"]
-                        if '-' in auxiliar:
+                            for servidor in info["servidores_conhecidos"]:
+                                requests.post(servidor["url"] + '/eleicao/coordenador',
+                                              json={"coordenador": info["identificacao"],
+                                                    "id_eleicao": auxiliar})
+                    elif dadosEleicao["tipo_de_eleicao_ativa"] == "anel":
+                        for servidor in info["servidores_conhecidos"]:
+                            anel(servidor["url"])
+                        lista.append((info["ponto_de_acesso"], info["identificacao"]))
+                        listaServidores = sorted(lista, key=lambda x: x[1])
+                        lista = []
+                        if 'participantes' in request.json:
+                            dados = request.json
+                            participantes.append(dados["participantes"])
                             for servidor in listaServidores:
                                 cont += 1
                                 if servidor[1] > info["identificacao"]:
-                                    requests.post(servidor[0] + '/eleicao', json={"id": auxiliar + '-'
-                                                                                        + str(info["identificacao"])})
+                                    requests.post(servidor[0] + "/eleicao",
+                                                  json={"id": dados["id"],
+                                                        "participantes": participantes})
                                     break
-                                elif len(listaServidores) == cont:
-                                    requests.post(listaServidores[0][0] + '/eleicao', json={"id": auxiliar + '-'
-                                                                                        + str(info["identificacao"])})
+                                elif len(listaServidores) == cont and len(listaServidores) > 1:
+                                    requests.post(listaServidores[0][0] + "/eleicao",
+                                                  json={"id": dados["id"],
+                                                        "participantes": participantes})
                         else:
+                            auxiliar = request.json["id"]
                             for servidor in listaServidores:
                                 cont += 1
                                 if servidor[1] > info["identificacao"]:
                                     requests.post(servidor[0] + '/eleicao', json={"id": auxiliar + '-'
                                                                                         + str(info["identificacao"])})
-                                    break
-                                elif len(info["servidores_conhecidos"]) == cont:
+                                    return jsonify({"id": auxiliar + '-' + str(info["identificacao"])})
+                                elif len(listaServidores) == cont:
                                     requests.post(listaServidores[0][0] + '/eleicao', json={"id": auxiliar + '-'
                                                                                                   + str(
                                         info["identificacao"])})
-
+                                    return jsonify({"id": auxiliar + '-' + str(info["identificacao"])})
+                    else:
+                        return jsonify(dadosEleicao), 409
                 else:
-                    return jsonify(dadosEleicao), 409
+                    return jsonify({"id": "erro - tipo invalido"})
             elif info["eleicao"] == "anel" and estado is True:
                 if "participantes" in request.json and info["identificacao"] in request.json["participantes"]:
                     dados = request.json
@@ -235,10 +227,13 @@ def funEleicao():
                 else:
                     lista = []
                     dados = request.json["id"]
+                    print(dados)
                     id = dados.split("-")
                     for i in id[1:]:
                         lista.append(i)
                     lista.sort()
+                    print(lista)
+                    print(info["identificacao"] in lista)
                     if str(info["identificacao"]) in lista:
                         requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                       json={"coordenador": lista[len(lista) - 1],
@@ -249,7 +244,7 @@ def funEleicao():
                                               json={"coordenador": lista[len(lista) - 1],
                                                     "id_eleicao": id[0]})
                         estado = False
-                        return jsonify(dados)
+                        return jsonify(request.json["id"])
                     else:
                         lista.append(info["identificacao"])
                         lista.sort()
@@ -260,13 +255,13 @@ def funEleicao():
                                     if j["id"] == i:
                                         requests.post(j["url"] + '/eleicao',
                                                       json={"id": str(dados) + '-' + str(info["identificacao"])})
-                                    break
+                                    return jsonify({"id": dados + '-' + str(info["identificacao"])})
                             elif cont == len(lista):
                                 for j in info["servidores_conhecidos"]:
                                     if j["id"] == lista[0]:
                                         requests.post(j["url"] + '/eleicao',
                                                       json={"id": str(dados) + '-' + str(info["identificacao"])})
-                                    break
+                                    return jsonify({"id": dados + '-' + str(info["identificacao"])})
         except KeyError:
             pass
         except TypeError:
