@@ -7,10 +7,10 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 verifica = False
-competicao = False
+competicao = True
 estado = False
 lista = []
-validos = []
+participantes = []
 auxiliar = ""
 
 info = {
@@ -45,6 +45,7 @@ info = {
         }
     ]
 }
+
 
 dadosEleicao = {
     "tipo_de_eleicao_ativa": info["eleicao"],
@@ -112,6 +113,7 @@ def valentao(url):
             "eleicao"] == "valentao":
             competicao = True
             requests.post(url + "/eleicao", json={"id": auxiliar})
+            print("Perdi para '%s' [%d]" % (url, dados["identificacao"]))
     except TypeError:
         pass
 
@@ -119,7 +121,7 @@ def valentao(url):
 def anel(url):
     global lista
     try:
-        dados = requests.get(url + "/info").json()
+        dados = requests.get(url + '/info').json()
         if dados["status"] == "down" or dados["eleicao"] == "valentao":
             print(f"Servidor: '{url}' invalido")
         else:
@@ -161,6 +163,7 @@ def funEleicao():
                         anel(servidor["url"])
                     lista.append((info["ponto_de_acesso"], info["identificacao"]))
                     listaServidores = sorted(lista, key=lambda x: x[1])
+                    lista = []
                     if 'participantes' in request.json:
                         dados = request.json
                         participantes.append(dados["participantes"])
@@ -299,11 +302,15 @@ def coord():
 
 @app.route('/reset', methods=['GET'])
 def reset():
-    global dadosCoordenador, info
+    global dadosCoordenador, info, estado, competicao, lista, auxiliar, participantes
     dadosCoordenador["coordenador"] = ""
-    dadosCoordenador["id_eleicao"] = ''
-    info["identificacao"] = 2
+    dadosCoordenador["id_eleicao"] = ""
+    auxiliar = ""
+    estado = False
+    competicao = True
     info["lider"] = False
+    lista = []
+    participantes = []
     return jsonify(info, dadosCoordenador)
 
 
@@ -314,7 +321,7 @@ def respFunc():
 
 
 def main():
-    port = int(os.environ.get("PORT", 3002))
+    port = int(os.environ.get("PORT", 3000))
     app.run(host='0.0.0.0', port=port)
 
 
