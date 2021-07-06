@@ -292,11 +292,15 @@ def coord():
 
 @app.route('/reset', methods=['GET'])
 def reset():
-    global dadosCoordenador, info
+    global dadosCoordenador, info, estado, competicao, lista, auxiliar, participantes
     dadosCoordenador["coordenador"] = ""
-    dadosCoordenador["id_eleicao"] = ''
-    info["identificacao"] = 2
+    dadosCoordenador["id_eleicao"] = ""
+    auxiliar = ""
+    estado = False
+    competicao = True
     info["lider"] = False
+    lista = []
+    participantes = []
     return jsonify(info, dadosCoordenador)
 
 
