@@ -239,6 +239,9 @@ def funEleicao():
                     print(dados)
                     lista.sort()
                     print(dados)
+                    print(lista)
+                    print(info["identificacao"])
+                    print(str(info["identificacao"]) in lista)
                     if str(info["identificacao"]) in lista:
                         requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                       json={"coordenador": lista[len(lista) - 1],
