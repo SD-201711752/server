@@ -24,7 +24,7 @@ info = {
     "eleicao": "valentao",
     "servidores_conhecidos": [
         {
-            "id": 1,
+            "id": 3,
             "url": "https://sd-rdm.herokuapp.com"
         },
         {
@@ -32,15 +32,15 @@ info = {
             "url": "https://sd-201620236.herokuapp.com"
         },
         {
-            "id": 3,
+            "id": 10,
             "url": "https://sd-mgs.herokuapp.com"
         },
         {
-            "id": 4,
+            "id": 5,
             "url": "https://sd-jhsq.herokuapp.com"
         },
         {
-            "id": 5,
+            "id": 4,
             "url": "https://sd-app-server-jesulino.herokuapp.com"
         }
     ]
