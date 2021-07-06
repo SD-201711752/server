@@ -142,6 +142,10 @@ def funEleicao():
             cont = 0
             competicao = False
             print(info["eleicao"])
+            print(estado)
+            print(request.json["id"]
+            print(dadosEleicao["tipo_de_eleicao_ativa"])
+            print(dadosEleicao["tipo_de_eleicao_ativa"] == "anel")
             if not estado:
                 if type(request.json["id"]) is not int:
                     estado = True
@@ -160,10 +164,12 @@ def funEleicao():
                                                     "id_eleicao": auxiliar})
                     elif dadosEleicao["tipo_de_eleicao_ativa"] == "anel":
                         for servidor in info["servidores_conhecidos"]:
+                            print(servidor["url"])
                             anel(servidor["url"])
+                        print(lista)
                         lista.append((info["ponto_de_acesso"], info["identificacao"]))
                         listaServidores = sorted(lista, key=lambda x: x[1])
-                        lista = []
+                        print(listaServidores)
                         if 'participantes' in request.json:
                             dados = request.json
                             participantes.append(dados["participantes"])
@@ -193,7 +199,7 @@ def funEleicao():
                                         info["identificacao"])})
                                     return jsonify({"id": auxiliar + '-' + str(info["identificacao"])})
                     else:
-                        return jsonify(dadosEleicao), 409
+                        return jsonify({"id":"erro"}), 409
                 else:
                     return jsonify({"id": "erro - tipo invalido"}), 409
             elif info["eleicao"] == "anel" and estado is True:
