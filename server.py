@@ -143,7 +143,7 @@ def funEleicao():
             competicao = False
             print(info["eleicao"])
             print(estado)
-            print(request.json["id"]
+            print(request.json["id"])
             print(dadosEleicao["tipo_de_eleicao_ativa"])
             print(dadosEleicao["tipo_de_eleicao_ativa"] == "anel")
             if not estado:
