@@ -52,14 +52,14 @@ dadosCoordenador = {
 }
 
 dadosEleicao = {
-    "tipo_de_eleicao_ativa": info["eleicao"],
+    "tipo_de_eleicao_ativa": "valentao",
     "eleicao_em_andamento": estado
 }
 
 
 @app.route('/info', methods=['GET', 'POST'])
 def funInfo():
-    global info
+    global info, dadosEleicao
     if request.method == 'POST':
         dados = request.get_json()
         try:
@@ -80,6 +80,8 @@ def funInfo():
         try:
             if dados["eleicao"] == "valentao" or dados["eleicao"] == "anel":
                 info["eleicao"] = dados["eleicao"]
+                dadosEleicao["tipo_de_eleicao_ativa"] = dados["eleicao"]
+                
         except KeyError:
             pass
         return jsonify(info)
