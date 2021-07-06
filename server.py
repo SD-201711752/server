@@ -42,7 +42,7 @@ info = {
         {
             "id": 9,
             "url": "https://sd-mgs.herokuapp.com"
-        },
+        }
     ]
 }
 
