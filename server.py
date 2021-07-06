@@ -283,8 +283,12 @@ def coord():
         return jsonify(dadosCoordenador)
     elif request.method == 'POST':
         dados = request.json
+        print(dados["coordenador"])
+        print(info["identificacao"])
         dadosCoordenador["coordenador"] = dados["coordenador"]
         dadosCoordenador["id_eleicao"] = dados["id_eleicao"]
+        print(dadosCoordenador["coordenador"] == info["identificacao"])
+        print(int(dadosCoordenador["coordenador"]) == info["identificacao"])
         if int(dadosCoordenador["coordenador"]) == info["identificacao"]:
             info["lider"] = True
         else:
