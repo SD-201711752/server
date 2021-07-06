@@ -121,7 +121,7 @@ def anel(url):
     try:
         dados = requests.get(url + "/info").json()
         if dados["status"] == "down" or dados["eleicao"] == "valentao":
-            print(f"Servidor: '{url}' invalido")
+            pass
         else:
             lista.append((url, dados["identificacao"]))
             print(f"Servidor '{url}' valido")
@@ -237,12 +237,12 @@ def funEleicao():
                     if str(info["identificacao"]) in lista:
                         requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                       json={"coordenador": lista[len(lista) - 1],
-                                            "id_eleicao": id[0]})
+                                            "id_eleicao": dados})
                         for i in info["servidores_conhecidos"]:
                             if str(i["id"]) in lista:
                                 requests.post(i["url"] + '/eleicao/coordenador',
                                               json={"coordenador": lista[len(lista) - 1],
-                                                    "id_eleicao": id[0]})
+                                                    "id_eleicao": dados})
                         estado = False
                         return jsonify(request.json["id"])
                     else:
