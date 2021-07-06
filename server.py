@@ -236,20 +236,16 @@ def funEleicao():
                     id = dados.split("-")
                     for i in id[1:]:
                         lista.append(i)
-                    print(dados)
-                    lista.sort()
-                    print(dados)
-                    print(lista)
-                    print(info["identificacao"])
-                    print(str(info["identificacao"]) in lista)
+                    aux = list(map(int, lista))
+                    aux.sort()
                     if str(info["identificacao"]) in lista:
                         requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
-                                      json={"coordenador": lista[len(lista) - 1],
+                                      json={"coordenador": aux[len(lista) - 1],
                                             "id_eleicao": dados})
                         for i in info["servidores_conhecidos"]:
                             if str(i["id"]) in lista:
                                 requests.post(i["url"] + '/eleicao/coordenador',
-                                              json={"coordenador": lista[len(lista) - 1],
+                                              json={"coordenador": aux[len(lista) - 1],
                                                     "id_eleicao": dados})
                         return jsonify(request.json["id"])
                     else:
