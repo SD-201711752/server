@@ -7,10 +7,10 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 verifica = False
-competicao = True
+competicao = False
 estado = False
 lista = []
-participantes = []
+validos = []
 auxiliar = ""
 
 info = {
@@ -24,7 +24,7 @@ info = {
     "eleicao": "valentao",
     "servidores_conhecidos": [
         {
-            "id": 3,
+            "id": 1,
             "url": "https://sd-rdm.herokuapp.com"
         },
         {
@@ -32,20 +32,19 @@ info = {
             "url": "https://sd-201620236.herokuapp.com"
         },
         {
-            "id": 10,
+            "id": 3,
             "url": "https://sd-mgs.herokuapp.com"
         },
         {
-            "id": 5,
+            "id": 4,
             "url": "https://sd-jhsq.herokuapp.com"
         },
         {
-            "id": 4,
+            "id": 5,
             "url": "https://sd-app-server-jesulino.herokuapp.com"
         }
     ]
 }
-
 
 dadosEleicao = {
     "tipo_de_eleicao_ativa": info["eleicao"],
@@ -113,7 +112,6 @@ def valentao(url):
             "eleicao"] == "valentao":
             competicao = True
             requests.post(url + "/eleicao", json={"id": auxiliar})
-            print("Perdi para '%s' [%d]" % (url, dados["identificacao"]))
     except TypeError:
         pass
 
@@ -121,7 +119,7 @@ def valentao(url):
 def anel(url):
     global lista
     try:
-        dados = requests.get(url + '/info').json()
+        dados = requests.get(url + "/info").json()
         if dados["status"] == "down" or dados["eleicao"] == "valentao":
             print(f"Servidor: '{url}' invalido")
         else:
@@ -163,7 +161,6 @@ def funEleicao():
                         anel(servidor["url"])
                     lista.append((info["ponto_de_acesso"], info["identificacao"]))
                     listaServidores = sorted(lista, key=lambda x: x[1])
-                    lista = []
                     if 'participantes' in request.json:
                         dados = request.json
                         participantes.append(dados["participantes"])
@@ -181,26 +178,27 @@ def funEleicao():
                                                     "participantes": participantes})
                     else:
                         auxiliar = request.json["id"]
-                        if '-' in str(auxiliar):
+                        if '-' in auxiliar:
                             for servidor in listaServidores:
                                 cont += 1
                                 if servidor[1] > info["identificacao"]:
-                                    requests.post(servidor[0] + '/eleicao', json={"id": str(auxiliar) + '-'
-                                                                                      + str(info["identificacao"])})
+                                    requests.post(servidor[0] + '/eleicao', json={"id": auxiliar + '-'
+                                                                                        + str(info["identificacao"])})
                                     break
                                 elif len(listaServidores) == cont:
-                                    requests.post(listaServidores[0][0] + '/eleicao', json={"id": str(auxiliar) + '-'
-                                                                                     + str(info["identificacao"])})
+                                    requests.post(listaServidores[0][0] + '/eleicao', json={"id": auxiliar + '-'
+                                                                                        + str(info["identificacao"])})
                         else:
                             for servidor in listaServidores:
                                 cont += 1
                                 if servidor[1] > info["identificacao"]:
-                                    requests.post(servidor[0] + '/eleicao', json={"id": str(auxiliar) + '-'
-                                                                                  + str(info["identificacao"])})
+                                    requests.post(servidor[0] + '/eleicao', json={"id": auxiliar + '-'
+                                                                                        + str(info["identificacao"])})
                                     break
                                 elif len(info["servidores_conhecidos"]) == cont:
-                                    requests.post(listaServidores[0][0] + '/eleicao', json={"id": str(auxiliar) + '-'
-                                                                                     + str(info["identificacao"])})
+                                    requests.post(listaServidores[0][0] + '/eleicao', json={"id": auxiliar + '-'
+                                                                                                  + str(
+                                        info["identificacao"])})
 
                 else:
                     return jsonify(dadosEleicao), 409
@@ -241,9 +239,6 @@ def funEleicao():
                     for i in id[1:]:
                         lista.append(i)
                     lista.sort()
-                    print(info["identificacao"])
-                    print(lista)
-                    print(info["identificacao"] in lista)
                     if str(info["identificacao"]) in lista:
                         requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                       json={"coordenador": lista[len(lista) - 1],
@@ -302,15 +297,11 @@ def coord():
 
 @app.route('/reset', methods=['GET'])
 def reset():
-    global dadosCoordenador, info, estado, competicao, lista, auxiliar, participantes
+    global dadosCoordenador, info
     dadosCoordenador["coordenador"] = ""
-    dadosCoordenador["id_eleicao"] = ""
-    auxiliar = ""
-    estado = False
-    competicao = True
+    dadosCoordenador["id_eleicao"] = ''
+    info["identificacao"] = 2
     info["lider"] = False
-    lista = []
-    participantes = []
     return jsonify(info, dadosCoordenador)
 
 
@@ -321,7 +312,7 @@ def respFunc():
 
 
 def main():
-    port = int(os.environ.get("PORT", 3000))
+    port = int(os.environ.get("PORT", 3002))
     app.run(host='0.0.0.0', port=port)
 
 
