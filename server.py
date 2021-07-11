@@ -190,7 +190,7 @@ def funEleicao():
                                               json={"coordenador": info["identificacao"],
                                                     "id_eleicao": auxiliar})
                             time.sleep(5)
-                            estado = False
+                        estado = False
                     elif dadosEleicao["tipo_de_eleicao_ativa"] == "anel":
                         for servidor in info["servidores_conhecidos"]:
                             print(servidor["url"])
