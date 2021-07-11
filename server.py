@@ -32,6 +32,10 @@ info = {
             "url": "https://sd-201620236.herokuapp.com"
         },
         {
+            "id": 3,
+            "url": "https://sd-rdm.herokuapp.com"
+        },
+        {
             "id": 4,
             "url": "https://sd-app-server-jesulino.herokuapp.com"
         },
@@ -42,11 +46,7 @@ info = {
         {
             "id": 9,
             "url": "https://sd-mgs.herokuapp.com"
-        },
-         {
-            "id": 3,
-            "url": "https://sd-rdm.herokuapp.com"
-        },
+        }
     ]
 }
 
@@ -83,15 +83,9 @@ def funInfo():
             pass
         try:
             if dados["eleicao"] == "valentao" or dados["eleicao"] == "anel":
-                print(eleicao)
                 eleicao = dados["eleicao"]
-                print(eleicao)
-                print(info["eleicao"])
-                print(dadosEleicao["tipo_de_eleicao_ativa"])
-                info["eleicao"] = dados["eleicao"]
-                print(dadosEleicao["tipo_de_eleicao_ativa"])
+                info["eleicao"] = dados["eleicao"] 
                 dadosEleicao["tipo_de_eleicao_ativa"] = dados["eleicao"]
-                print(dadosEleicao["tipo_de_eleicao_ativa"])
         except KeyError:
             pass
         return jsonify(info)
@@ -137,13 +131,9 @@ def funcRecurso(url):
     global operacao, auxiliar2, ID
     try:
         dados1 = requests.get(url + '/recurso')
-        print(dados1)
-        print(url)
         dados2 = dados1.json()
-        print(dados2)
-        print(dados1.status_code)
         aux = requests.get(url + '/info').json()
-        if dados2["ocupado"] is True and aux["lider"] is not True:
+        if dados2["ocupado"] is True and (aux["lider"] is not True or not int(aux["lider"]) == 1):
             operacao = 409
         elif aux["lider"] is True or int(aux["lider"]) == 1:
             auxiliar2 = url
@@ -170,9 +160,6 @@ def valentao(url):
         if dados["identificacao"] > info["identificacao"] and dados["status"] == "up" and dados[
             "eleicao"] == "valentao":
             competicao = True
-            print(auxiliar)
-            print(url)
-            print(dados["identificacao"])
             requests.post(url + '/eleicao', json={"id": auxiliar})
     except TypeError:
         pass
