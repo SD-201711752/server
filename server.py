@@ -54,7 +54,7 @@ dadosCoordenador = {
 }
 
 dadosEleicao = {
-    "tipo_de_eleicao_ativa": "valentao",
+    "tipo_de_eleicao_ativa": info["eleicao"],
     "eleicao_em_andamento": estado
 }
 
@@ -81,8 +81,12 @@ def funInfo():
             pass
         try:
             if dados["eleicao"] == "valentao" or dados["eleicao"] == "anel":
+                print(info["eleicao"])
+                print(dadosEleicao["tipo_de_eleicao_ativa"])
                 info["eleicao"] = dados["eleicao"]
                 dadosEleicao["tipo_de_eleicao_ativa"] = dados["eleicao"]
+                print(info["eleicao"])
+                print(dadosEleicao["tipo_de_eleicao_ativa"])
                 
         except KeyError:
             pass
@@ -177,6 +181,8 @@ def funEleicao():
             if not estado:
                 if type(request.json["id"]) is not int:
                     estado = True
+                    print(dadosEleicao["tipo_de_eleicao_ativa"])
+                    print(info["eleicao])
                     if dadosEleicao["tipo_de_eleicao_ativa"] == "valentao":
                         auxiliar = request.json["id"]
                         for servidor in info["servidores_conhecidos"]:
