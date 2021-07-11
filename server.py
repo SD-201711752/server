@@ -189,7 +189,7 @@ def funEleicao():
                     if dadosEleicao["tipo_de_eleicao_ativa"] == "valentao":
                         auxiliar = request.json["id"]
                         for servidor in info["servidores_conhecidos"]:
-                            valentao(servidor["url
+                            valentao(servidor["url"])
                             time.sleep(3)
                         if competicao is False:
                             requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
