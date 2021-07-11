@@ -117,9 +117,8 @@ def funEstado():
         if info["lider"] is True:
             if verifica is False:
                 verifica = True
+                threading.Thread(target=respFunc, args=()).start()
                 operacao = 200
-                # time.sleep(20)
-                verifica = False
             elif verifica is True:
                 operacao = 409
             return jsonify({"ocupado": verifica, "id_lider": info["identificacao"]}), operacao
@@ -130,8 +129,7 @@ def funEstado():
             if operacao == 200:
                 verifica = True
                 requests.post(auxiliar2 + '/recurso')
-                # time.sleep(20)
-                verifica = False
+                threading.Thread(target=respFunc, args=()).start()
             return jsonify({"ocupado": verifica, "id_lider": ID}), operacao
 
 
@@ -157,7 +155,13 @@ def funcRecurso(url):
     except TypeError:
         pass
     
-        
+    
+def respFunc():
+    global verifica
+    time.sleep(20)
+    verifica = False
+    
+    
 def valentao(url):
     global competicao, auxiliar, info
     dados = requests.get(url + '/info').json()
