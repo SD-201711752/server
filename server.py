@@ -32,10 +32,6 @@ info = {
             "url": "https://sd-201620236.herokuapp.com"
         },
         {
-            "id": 3,
-            "url": "https://sd-rdm.herokuapp.com"
-        },
-        {
             "id": 4,
             "url": "https://sd-app-server-jesulino.herokuapp.com"
         },
@@ -46,7 +42,11 @@ info = {
         {
             "id": 9,
             "url": "https://sd-mgs.herokuapp.com"
-        }
+        },
+         {
+            "id": 3,
+            "url": "https://sd-rdm.herokuapp.com"
+        },
     ]
 }
 
