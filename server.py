@@ -104,12 +104,15 @@ def funEstado():
     global verifica, operacao, auxiliar2
     if request.method == 'GET':
         if info["lider"] is True:
-            return jsonify({"ocupado": True, "id_lider": info["identificacao"]}), operacao
+             if verifica is False:
+                return jsonify({"ocupado": verifica, "id_lider": ID}), 200
+            elif verifica is True:
+                return jsonify({"ocupado": verifica, "id_lider": ID}), 409
         elif info["lider"] is False:
             if verifica is False:
-                return jsonify({"ocupado": verifica, "id_lider": ID}), 409
-            elif verifica is True:
                 return jsonify({"ocupado": verifica, "id_lider": ID}), 200
+            elif verifica is True:
+                return jsonify({"ocupado": verifica, "id_lider": ID}), 409
     elif request.method == 'POST':
         if info["lider"] is True:
             if verifica is False:
