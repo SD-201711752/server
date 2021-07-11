@@ -147,7 +147,7 @@ def funcRecurso(url):
         aux = requests.get(url + '/info').json()
         if dados2["ocupado"] is True and aux["lider"] is not True:
             operacao = 409
-        elif aux["lider"] is True:
+        elif aux["lider"] is True or int(aux["lider"]) == 1:
             auxiliar2 = url
             ID = aux["identificacao"]
     except requests.ConnectionError:
