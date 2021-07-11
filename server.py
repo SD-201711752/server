@@ -136,7 +136,10 @@ def funcRecurso(url):
     global operacao, auxiliar2, ID
     try:
         dados1 = requests.get(url + '/recurso')
+        print(dados1)
+        print(url)
         dados2 = dados1.json()
+        print(dados2)
         print(dados1.status_code)
         aux = requests.get(url + '/info').json()
         if dados2["ocupado"] is True and aux["lider"] is not True:
