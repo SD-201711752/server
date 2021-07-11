@@ -183,18 +183,18 @@ def funEleicao():
                     estado = True
                     print(dadosEleicao["tipo_de_eleicao_ativa"])
                     print(info["eleicao"])
-                    if dadosEleicao["tipo_de_eleicao_ativa"] == "valentao":
+                   if dadosEleicao["tipo_de_eleicao_ativa"] == "valentao":
                         auxiliar = request.json["id"]
                         for servidor in info["servidores_conhecidos"]:
                             valentao(servidor["url"])
                         if competicao is False:
-                            requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
-                                          json={"coordenador": info["identificacao"],
-                                                "id_eleicao": auxiliar})
+                             requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
+                                            json={"coordenador": info["identificacao"],
+                                                  "id_eleicao": auxiliar})
                             for servidor in info["servidores_conhecidos"]:
-                                requests.post(servidor["url"] + '/eleicao/coordenador',
-                                              json={"coordenador": info["identificacao"],
-                                                    "id_eleicao": auxiliar})
+                                 requests.post(servidor["url"] + '/eleicao/coordenador',
+                                               json={"coordenador": info["identificacao"],
+                                                     "id_eleicao": auxiliar})
                         time.sleep(6)
                         estado = False
                     elif dadosEleicao["tipo_de_eleicao_ativa"] == "anel":
