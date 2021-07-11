@@ -142,12 +142,13 @@ def funcRecurso(url):
 
 
 def valentao(url):
-    global competicao
+    global competicao, auxiliar
     dados = requests.get(url + '/info').json()
     try:
         if dados["identificacao"] > info["identificacao"] and dados["status"] == "up" and dados[
             "eleicao"] == "valentao":
             competicao = True
+            print(auxiliar)
             requests.post(url + "/eleicao", json={"id": auxiliar})
     except TypeError:
         pass
