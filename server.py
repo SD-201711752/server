@@ -183,15 +183,14 @@ def funEleicao():
             print(eleicao)
             print(dadosEleicao["tipo_de_eleicao_ativa"])
             print(info["eleicao"])
+            auxiliar = request.json["id"]
             if not estado:
-                if type(request.json["id"]) is not int and not eleicao == "anel":
+                if type(auxiliar) is not int:
                     estado = True
                     # print(dadosEleicao["tipo_de_eleicao_ativa"])
                     #vprint(info["eleicao"])
                     # print(dadosEleicao["tipo_de_eleicao_ativa"] == "valentao")
                     if print(dadosEleicao["tipo_de_eleicao_ativa"] == "valentao"):
-                        auxiliar = request.json["id"]
-                        print(auxiliar)
                         for servidor in info["servidores_conhecidos"]:
                             print(serservidor["url"])
                             valentao(servidor["url"])
@@ -319,8 +318,6 @@ def funEleicao():
             pass
         return jsonify({"id": auxiliar})
     elif request.method == 'GET':
-        print(estado)
-        print(eleicao)
         return jsonify({"tipo_de_eleicao_ativa": eleicao, "eleicao_em_andamento": estado})
 
 
