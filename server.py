@@ -182,7 +182,7 @@ def funEleicao():
             cont = 0
             competicao = False
             if not estado:
-                if type(request.json["id"]) is not int:
+                if type(request.json["id"]) is not int and dadosEleicao["tipo_de_eleicao_ativa"] == "anel":
                     estado = True
                     # print(dadosEleicao["tipo_de_eleicao_ativa"])
                     #vprint(info["eleicao"])
