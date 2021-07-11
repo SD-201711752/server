@@ -83,9 +83,14 @@ def funInfo():
             pass
         try:
             if dados["eleicao"] == "valentao" or dados["eleicao"] == "anel":
+                print(eleicao)
                 eleicao = dados["eleicao"]
-                # dadosEleicao["tipo_de_eleicao_ativa"] = dados["eleicao"]
+                print(eleicao)
                 print(info["eleicao"])
+                print(dadosEleicao["tipo_de_eleicao_ativa"])
+                info["eleicao"] = dados["eleicao"]
+                print(dadosEleicao["tipo_de_eleicao_ativa"])
+                dadosEleicao["tipo_de_eleicao_ativa"] = dados["eleicao"]
                 print(dadosEleicao["tipo_de_eleicao_ativa"])
         except KeyError:
             pass
