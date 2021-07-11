@@ -132,7 +132,7 @@ def funEstado():
                 requests.post(auxiliar2 + '/recurso')
                 # time.sleep(20)
                 verifica = False
-            return jsonify({"ocupado": verifica}, "id_lider": ID), operacao
+            return jsonify({"ocupado": verifica}, "id_lider": ID}), operacao
 
 
 def funcRecurso(url):
