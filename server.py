@@ -105,9 +105,9 @@ def funEstado():
     if request.method == 'GET':
         if info["lider"] is True:
              if verifica is False:
-                return jsonify({"ocupado": verifica, "id_lider": ID}), 200
+                return jsonify({"ocupado": verifica, "id_lider": info["identificacao"]}), 200
              elif verifica is True:
-                return jsonify({"ocupado": verifica, "id_lider": ID}), 409
+                return jsonify({"ocupado": verifica, "id_lider": info["identificacao"]}), 409
         elif info["lider"] is False:
             if verifica is False:
                 return jsonify({"ocupado": verifica, "id_lider": ID}), 200
@@ -122,7 +122,7 @@ def funEstado():
                 verifica = False
             elif verifica is True:
                 operacao = 409
-            return jsonify({"ocupado": verifica}), operacao
+            return jsonify({"ocupado": verifica, "id_lider": info["identificacao"]}), operacao
         elif info["lider"] is False:
             operacao = 200
             for servidor in info["servidores_conhecidos"]:
