@@ -142,8 +142,9 @@ def funcRecurso(url):
 
 
 def valentao(url):
-    global competicao, auxiliar
+    global competicao, auxiliar, info
     dados = requests.get(url + '/info').json()
+    print(info["identificacao"])
     try:
         if dados["identificacao"] > info["identificacao"] and dados["status"] == "up" and dados[
             "eleicao"] == "valentao":
@@ -183,14 +184,16 @@ def funEleicao():
             if not estado:
                 if type(request.json["id"]) is not int:
                     estado = True
-                    print(dadosEleicao["tipo_de_eleicao_ativa"])
-                    print(info["eleicao"])
-                    print(dadosEleicao["tipo_de_eleicao_ativa"] == "valentao")
-                    if dadosEleicao["tipo_de_eleicao_ativa"] == "valentao":
+                    # print(dadosEleicao["tipo_de_eleicao_ativa"])
+                    #vprint(info["eleicao"])
+                    # print(dadosEleicao["tipo_de_eleicao_ativa"] == "valentao")
+                    if print(dadosEleicao["tipo_de_eleicao_ativa"] == "valentao"):
                         auxiliar = request.json["id"]
+                        print(auxiliar)
                         for servidor in info["servidores_conhecidos"]:
+                            print(serservidor["url"])
                             valentao(servidor["url"])
-                            time.sleep(3)
+                        print(competicao)
                         if competicao is False:
                             requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                           json={"coordenador": info["identificacao"],
@@ -315,7 +318,7 @@ def funEleicao():
         return jsonify({"id": auxiliar})
     elif request.method == 'GET':
         print(estado)
-        print(info["eleicao"])
+        # print(info["eleicao"])
         return jsonify({"tipo_de_eleicao_ativa": info["eleicao"], "eleicao_em_andamento": estado})
 
 
