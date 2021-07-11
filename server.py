@@ -184,6 +184,8 @@ def funEleicao():
             print(dadosEleicao["tipo_de_eleicao_ativa"])
             print(info["eleicao"])
             auxiliar = request.json["id"]
+            print(auxiliar)
+            print(type(auxiliar))
             if not estado:
                 if type(auxiliar) is not int:
                     estado = True
@@ -228,8 +230,7 @@ def funEleicao():
                                     requests.post(listaServidores[0][0] + "/eleicao",
                                                   json={"id": dados["id"],
                                                         "participantes": participantes})
-                        else:
-                            auxiliar = request.json["id"]
+                        else:  
                             print(info["identificacao"])
                             for servidor in listaServidores:
                                 cont += 1
