@@ -23,7 +23,7 @@ info = {
     "descricao": "serve os clientes com os servicos disponilizados",
     "ponto_de_acesso": "https://sd-dmss.herokuapp.com",
     "status": "up",
-    "identificacao": 1,
+    "identificacao": 7,
     "lider": False,
     "eleicao": eleicao,
     "servidores_conhecidos": [
