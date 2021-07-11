@@ -106,7 +106,7 @@ def funEstado():
         if info["lider"] is True:
              if verifica is False:
                 return jsonify({"ocupado": verifica, "id_lider": ID}), 200
-            elif verifica is True:
+             elif verifica is True:
                 return jsonify({"ocupado": verifica, "id_lider": ID}), 409
         elif info["lider"] is False:
             if verifica is False:
