@@ -9,7 +9,9 @@ app = Flask(__name__)
 verifica = False
 competicao = True
 estado = False
+operacao = 200
 lista = []
+ID = ""
 participantes = []
 auxiliar = ""
 
@@ -91,19 +93,48 @@ def funInfo():
 
 @app.route('/recurso', methods=['GET', 'POST'])
 def funEstado():
-    global verifica
+    global verifica, operacao
     if request.method == 'GET':
-        operacao = 200
-        return jsonify({"ocupado": verifica}), operacao
+        if info["lider"] is True:
+            return jsonify({"ocupado": True, "id_lider": info["identificacao"]}), operacao
+        elif info["lider"] is False:
+            if verifica is False:
+                return jsonify({"ocupado": verifica, "id_lider": ID}), 409
+            elif verifica is True:
+                return jsonify({"ocupado": verifica, "id_lider": ID}), 200
     elif request.method == 'POST':
-        thr = threading.Thread(target=respFunc, args=())
-        if verifica:
-            operacao = 409
-        else:
-            verifica = True
-            thr.start()
+        if info["lider"] is True:
+            if verifica is False:
+                verifica = True
+                operacao = 200
+                time.sleep(20)
+                verifica = False
+            elif verifica is True:
+                operacao = 409
+            return jsonify({"ocupado": verifica}), operacao
+        elif info["lider"] is False:
             operacao = 200
-        return jsonify({"ocupado": verifica}), operacao
+            for servidor in info["servidores_conhecidos"]:
+                funcRecurso(servidor["url"])
+            if operacao == 200:
+                verifica = True
+                requests.post(auxiliar + '/recurso')
+                time.sleep(20)
+                verifica = False
+            return jsonify({"ocupado": verifica}), operacao
+
+
+def funcRecurso(url):
+    global operacao, auxiliar, ID
+    dados1 = requests.get(url + '/recurso')
+    dados2 = dados1.json()
+    print(dados1.status_code)
+    aux = requests.get(url + '/info').json()
+    if dados2["ocupado"] is True and aux["lider"] is not True:
+        operacao = 409
+    elif aux["lider"] is True:
+        auxiliar = url
+        ID = aux["identificacao"]
 
 
 def valentao(url):
@@ -196,9 +227,9 @@ def funEleicao():
                                         info["identificacao"])})
                                     return jsonify({"id": auxiliar + '-' + str(info["identificacao"])})
                     else:
-                        return jsonify({"id":"erro"}), 409
+                        return jsonify({"id":"erro"}), 400
                 else:
-                    return jsonify({"id": "erro - tipo invalido"}), 409
+                    return jsonify({"id": "erro - tipo invalido"}), 400
             elif info["eleicao"] == "anel" and estado is True:
                 if "participantes" in request.json and info["identificacao"] in request.json["participantes"]:
                     dados = request.json
@@ -308,12 +339,6 @@ def reset():
     info["lider"] = False
     lista = []
     return jsonify(info, dadosCoordenador)
-
-
-def respFunc():
-    global verifica
-    time.sleep(10)
-    verifica = False
 
 
 def main():
