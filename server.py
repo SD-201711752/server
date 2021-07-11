@@ -118,7 +118,7 @@ def funEstado():
             if verifica is False:
                 verifica = True
                 operacao = 200
-                time.sleep(20)
+                # time.sleep(20)
                 verifica = False
             elif verifica is True:
                 operacao = 409
@@ -130,9 +130,9 @@ def funEstado():
             if operacao == 200:
                 verifica = True
                 requests.post(auxiliar2 + '/recurso')
-                time.sleep(20)
+                # time.sleep(20)
                 verifica = False
-            return jsonify({"ocupado": verifica}), operacao
+            return jsonify({"ocupado": verifica}, "id_lider": ID), operacao
 
 
 def funcRecurso(url):
