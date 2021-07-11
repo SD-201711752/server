@@ -174,7 +174,8 @@ def anel(url):
 
 @app.route('/eleicao', methods=['GET', 'POST'])
 def funEleicao():
-    global dadosEleicao, competicao, auxiliar, participantes, estado, lista, info
+    global dadosEleicao, competicao, participantes, lista, info
+    global auxiliar, estado
     if request.method == 'POST':
         try:
             cont = 0
@@ -188,7 +189,8 @@ def funEleicao():
                     if dadosEleicao["tipo_de_eleicao_ativa"] == "valentao":
                         auxiliar = request.json["id"]
                         for servidor in info["servidores_conhecidos"]:
-                            valentao(servidor["url"])
+                            valentao(servidor["url
+                            time.sleep(3)
                         if competicao is False:
                             requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                           json={"coordenador": info["identificacao"],
@@ -198,7 +200,6 @@ def funEleicao():
                                               json={"coordenador": info["identificacao"],
                                                     "id_eleicao": auxiliar})
                         print(estado)
-                        time.sleep(3)
                         estado = False
                         print(estado)
                     elif dadosEleicao["tipo_de_eleicao_ativa"] == "anel":
