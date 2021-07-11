@@ -182,7 +182,7 @@ def funEleicao():
                 if type(request.json["id"]) is not int:
                     estado = True
                     print(dadosEleicao["tipo_de_eleicao_ativa"])
-                    print(info["eleicao])
+                    print(info["eleicao"])
                     if dadosEleicao["tipo_de_eleicao_ativa"] == "valentao":
                         auxiliar = request.json["id"]
                         for servidor in info["servidores_conhecidos"]:
