@@ -139,7 +139,7 @@ def funcRecurso(url):
         auxiliar2 = url
         ID = aux["identificacao"]
 
-
+        
 def valentao(url):
     global competicao, auxiliar, info
     dados = requests.get(url + '/info').json()
@@ -179,22 +179,14 @@ def funEleicao():
     if request.method == 'POST':
         try:
             cont = 0
-            competicao = False
-            print(eleicao)
-            print(dadosEleicao["tipo_de_eleicao_ativa"])
-            print(info["eleicao"])
+            competicao = False     
             auxiliar = request.json["id"]
-            print(auxiliar)
-            print(type(auxiliar))
             if not estado:
                 if type(auxiliar) is not int:
                     estado = True
-                    # print(dadosEleicao["tipo_de_eleicao_ativa"])
-                    #vprint(info["eleicao"])
-                    # print(dadosEleicao["tipo_de_eleicao_ativa"] == "valentao")
-                    if print(dadosEleicao["tipo_de_eleicao_ativa"] == "valentao"):
+                    if eleicao == "valentao":
                         for servidor in info["servidores_conhecidos"]:
-                            print(serservidor["url"])
+                            print(servidor["url"])
                             valentao(servidor["url"])
                         print(competicao)
                         if competicao is False:
