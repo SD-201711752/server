@@ -149,7 +149,9 @@ def valentao(url):
             "eleicao"] == "valentao":
             competicao = True
             print(auxiliar)
-            requests.post(url + "/eleicao", json={"id": auxiliar})
+            print(url)
+            print(dados["identificacao"])
+            requests.post(url + '/eleicao', json={"id": auxiliar})
     except TypeError:
         pass
 
