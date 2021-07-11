@@ -14,6 +14,7 @@ lista = []
 ID = ""
 participantes = []
 auxiliar = ""
+auxiliar2 = ""
 
 info = {
     "componente": "server",
@@ -96,7 +97,7 @@ def funInfo():
 
 @app.route('/recurso', methods=['GET', 'POST'])
 def funEstado():
-    global verifica, operacao
+    global verifica, operacao, auxiliar2
     if request.method == 'GET':
         if info["lider"] is True:
             return jsonify({"ocupado": True, "id_lider": info["identificacao"]}), operacao
@@ -121,14 +122,14 @@ def funEstado():
                 funcRecurso(servidor["url"])
             if operacao == 200:
                 verifica = True
-                requests.post(auxiliar + '/recurso')
+                requests.post(auxiliar2 + '/recurso')
                 time.sleep(20)
                 verifica = False
             return jsonify({"ocupado": verifica}), operacao
 
 
 def funcRecurso(url):
-    global operacao, auxiliar, ID
+    global operacao, auxiliar2, ID
     dados1 = requests.get(url + '/recurso')
     dados2 = dados1.json()
     print(dados1.status_code)
@@ -136,7 +137,7 @@ def funcRecurso(url):
     if dados2["ocupado"] is True and aux["lider"] is not True:
         operacao = 409
     elif aux["lider"] is True:
-        auxiliar = url
+        auxiliar2 = url
         ID = aux["identificacao"]
 
 
@@ -182,6 +183,7 @@ def funEleicao():
                     estado = True
                     print(dadosEleicao["tipo_de_eleicao_ativa"])
                     print(info["eleicao"])
+                    print(dadosEleicao["tipo_de_eleicao_ativa"] == "valentao")
                     if dadosEleicao["tipo_de_eleicao_ativa"] == "valentao":
                         auxiliar = request.json["id"]
                         for servidor in info["servidores_conhecidos"]:
@@ -194,8 +196,10 @@ def funEleicao():
                                 requests.post(servidor["url"] + '/eleicao/coordenador',
                                               json={"coordenador": info["identificacao"],
                                                     "id_eleicao": auxiliar})
-                        time.sleep(6)
+                        print(estado)
+                        time.sleep(3)
                         estado = False
+                        print(estado)
                     elif dadosEleicao["tipo_de_eleicao_ativa"] == "anel":
                         for servidor in info["servidores_conhecidos"]:
                             print(servidor["url"])
@@ -308,7 +312,8 @@ def funEleicao():
             pass
         return jsonify({"id": auxiliar})
     elif request.method == 'GET':
-        time.sleep(1)
+        print(estado)
+        print(info["eleicao"])
         return jsonify({"tipo_de_eleicao_ativa": info["eleicao"], "eleicao_em_andamento": estado})
 
 
