@@ -12,6 +12,7 @@ estado = False
 operacao = 200
 lista = []
 ID = ""
+eleicao = "valentao"
 participantes = []
 auxiliar = ""
 auxiliar2 = ""
@@ -24,7 +25,7 @@ info = {
     "status": "up",
     "identificacao": 1,
     "lider": False,
-    "eleicao": "valentao",
+    "eleicao": eleicao,
     "servidores_conhecidos": [
         {
             "id": 2,
@@ -55,14 +56,14 @@ dadosCoordenador = {
 }
 
 dadosEleicao = {
-    "tipo_de_eleicao_ativa": info["eleicao"],
+    "tipo_de_eleicao_ativa": eleicao,
     "eleicao_em_andamento": estado
 }
 
 
 @app.route('/info', methods=['GET', 'POST'])
 def funInfo():
-    global info, dadosEleicao
+    global info, dadosEleicao, eleicao
     if request.method == 'POST':
         dados = request.get_json()
         try:
@@ -82,10 +83,8 @@ def funInfo():
             pass
         try:
             if dados["eleicao"] == "valentao" or dados["eleicao"] == "anel":
-                print(info["eleicao"])
-                print(dadosEleicao["tipo_de_eleicao_ativa"])
-                info["eleicao"] = dados["eleicao"]
-                dadosEleicao["tipo_de_eleicao_ativa"] = dados["eleicao"]
+                eleicao = dados["eleicao"]
+                # dadosEleicao["tipo_de_eleicao_ativa"] = dados["eleicao"]
                 print(info["eleicao"])
                 print(dadosEleicao["tipo_de_eleicao_ativa"])
         except KeyError:
@@ -181,10 +180,11 @@ def funEleicao():
         try:
             cont = 0
             competicao = False
+            print(eleicao)
             print(dadosEleicao["tipo_de_eleicao_ativa"])
             print(info["eleicao"])
             if not estado:
-                if type(request.json["id"]) is not int and dadosEleicao["tipo_de_eleicao_ativa"] == "anel":
+                if type(request.json["id"]) is not int and not eleicao == "anel":
                     estado = True
                     # print(dadosEleicao["tipo_de_eleicao_ativa"])
                     #vprint(info["eleicao"])
@@ -321,7 +321,7 @@ def funEleicao():
     elif request.method == 'GET':
         print(estado)
         # print(info["eleicao"])
-        return jsonify({"tipo_de_eleicao_ativa": info["eleicao"], "eleicao_em_andamento": estado})
+        return jsonify({"tipo_de_eleicao_ativa": eleicao, "eleicao_em_andamento": estado})
 
 
 @app.route('/eleicao/coordenador', methods=['POST', 'GET'])
