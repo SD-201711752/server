@@ -175,7 +175,7 @@ def anel(url):
 @app.route('/eleicao', methods=['GET', 'POST'])
 def funEleicao():
     global dadosEleicao, competicao, participantes, lista, info
-    global auxiliar, estado
+    global auxiliar, estado, eleicao
     if request.method == 'POST':
         try:
             cont = 0
@@ -320,7 +320,7 @@ def funEleicao():
         return jsonify({"id": auxiliar})
     elif request.method == 'GET':
         print(estado)
-        # print(info["eleicao"])
+        print(eleicao)
         return jsonify({"tipo_de_eleicao_ativa": eleicao, "eleicao_em_andamento": estado})
 
 
