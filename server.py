@@ -51,7 +51,6 @@ info = {
         }
     ]
 }
-
 dadosCoordenador = {
     "coordenador": "",
     "id_eleicao": "o id da eleição"
@@ -121,6 +120,7 @@ def funEstado():
                 operacao = 409
             return jsonify({"ocupado": verifica, "id_lider": info["identificacao"]}), operacao
         elif info["lider"] == 0 and checkLider() is True:
+            operacao = 200
             for servidor in info["servidores_conhecidos"]:
                 funcRecurso(servidor["url"])
             if operacao == 200 and marcador == 0:
@@ -138,10 +138,9 @@ def funEstado():
 def funcRecurso(url):
     global operacao, auxiliar2, ID
     try:
-        dados1 = requests.get(url + '/recurso')
-        dados2 = dados1.json()
+        dados1 = requests.get(url + '/recurso').json()
         aux = requests.get(url + '/info').json()
-        if dados2["ocupado"] is True and aux["lider"] == 0:
+        if dados1["ocupado"] is True and aux["lider"] == 0:
             operacao = 409
         elif aux["lider"] == 1:
             auxiliar2 = url
@@ -160,11 +159,9 @@ def checkLider():
     try:
         for servidor in info["servidores_conhecidos"]:
             dados = requests.get(servidor["url"] + '/info').json()
-            print(dados["lider"])
-            print(type(dados["lider"]))
-            print(dados["lider"] == 1)
-            print(int(dados["lider"]) == 1)
-            if dados["lider"] is True or int(dados["lider"]) == 1:
+            if dados is None:
+                pass
+            elif dados["lider"] == 1 or dados["lider"] is True:
                 cont = 1
                 ID = dados["identificacao"]
                 break
