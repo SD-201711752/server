@@ -157,16 +157,27 @@ def funcRecurso(url):
 def checkLider():
     global ID
     cont = 0
-    for servidor in info["servidores_conhecidos"]:
-        dados = requests.get(servidor["url"] + '/info').json()
-        if dados["lider"] == 1:
-            cont = 1
-            ID = dados["identificacao"]
-            break
-    if cont == 1:
-        return True
-    else:
-        return False
+    try:
+        for servidor in info["servidores_conhecidos"]:
+            dados = requests.get(servidor["url"] + '/info').json()
+            print(dados["lider"])
+            print(type(dados["lider"]))
+            print(dados["lider"] == 1)
+            print(int(dados["lider"]) == 1)
+            if dados["lider"] is True or int(dados["lider"]) == 1:
+                cont = 1
+                ID = dados["identificacao"]
+                break
+        if cont == 1:
+            return True
+        else:
+            return False
+    except requests.ConnectionError:
+        pass
+    except KeyError:
+        pass
+    except TypeError:
+        pass
 
 
 def respFunc():
