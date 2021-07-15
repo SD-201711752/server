@@ -160,6 +160,10 @@ def checkLider():
     try:
         for servidor in info["servidores_conhecidos"]:
             dados = requests.get(servidor["url"] + '/info').json()
+            print(dados["lider"])
+            print(type(dados["lider"]))
+            print(dados["lider"] == 1)
+            print(int(dados["lider"]) == 1)
             if dados["lider"] is True or int(dados["lider"]) == 1:
                 cont = 1
                 ID = dados["identificacao"]
