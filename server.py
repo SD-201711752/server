@@ -10,6 +10,7 @@ verifica = False
 competicao = True
 estado = False
 operacao = 200
+marcador = 0
 lista = []
 ID = ""
 eleicao = "valentao"
@@ -84,7 +85,7 @@ def funInfo():
         try:
             if dados["eleicao"] == "valentao" or dados["eleicao"] == "anel":
                 eleicao = dados["eleicao"]
-                info["eleicao"] = dados["eleicao"] 
+                info["eleicao"] = dados["eleicao"]
                 dadosEleicao["tipo_de_eleicao_ativa"] = dados["eleicao"]
         except KeyError:
             pass
@@ -95,18 +96,20 @@ def funInfo():
 
 @app.route('/recurso', methods=['GET', 'POST'])
 def funEstado():
-    global verifica, operacao, auxiliar2
+    global verifica, operacao, auxiliar2, marcador
     if request.method == 'GET':
         if info["lider"] is True:
-             if verifica is False:
+            if verifica is False:
                 return jsonify({"ocupado": verifica, "id_lider": info["identificacao"]}), 200
-             elif verifica is True:
+            elif verifica is True:
                 return jsonify({"ocupado": verifica, "id_lider": info["identificacao"]}), 409
-        elif info["lider"] is False:
+        elif info["lider"] is False and checkLider() is True:
             if verifica is False:
                 return jsonify({"ocupado": verifica, "id_lider": ID}), 200
             elif verifica is True:
                 return jsonify({"ocupado": verifica, "id_lider": ID}), 409
+        else:
+            return jsonify({"erro": "não existe lider"}), 400
     elif request.method == 'POST':
         if info["lider"] is True:
             if verifica is False:
@@ -116,15 +119,19 @@ def funEstado():
             elif verifica is True:
                 operacao = 409
             return jsonify({"ocupado": verifica, "id_lider": info["identificacao"]}), operacao
-        elif info["lider"] is False:
-            operacao = 200
+        elif info["lider"] is False and checkLider() is True:
             for servidor in info["servidores_conhecidos"]:
                 funcRecurso(servidor["url"])
-            if operacao == 200:
+            if operacao == 200 and marcador == 0:
                 verifica = True
+                marcador = 1
                 requests.post(auxiliar2 + '/recurso')
                 threading.Thread(target=respFunc, args=()).start()
+            elif marcador == 1:
+                operacao = 409
             return jsonify({"ocupado": verifica, "id_lider": ID}), operacao
+        else:
+            return jsonify({"erro": "não existe lider"}), 400
 
 
 def funcRecurso(url):
@@ -144,14 +151,31 @@ def funcRecurso(url):
         pass
     except TypeError:
         pass
-    
-    
+
+
+def checkLider():
+    global ID
+    cont = 0
+    for servidor in info["servidores_conhecidos"]:
+        dados = requests.get(servidor["url"] + '/info').json()
+        if dados["lider"] is True or int(dados["lider"]) == 1:
+            cont = 1
+            ID = dados["identificacao"]
+            break
+    if cont == 1:
+        return True
+    else:
+        return False
+
+
 def respFunc():
-    global verifica
+    global verifica, operacao, marcador
     time.sleep(20)
+    marcador = 1
+    operacao = 200
     verifica = False
-    
-    
+
+
 def valentao(url):
     global competicao, auxiliar, info
     dados = requests.get(url + '/info').json()
@@ -190,7 +214,7 @@ def funEleicao():
     if request.method == 'POST':
         try:
             cont = 0
-            competicao = False     
+            competicao = False
             auxiliar = request.json["id"]
             if not estado:
                 if type(auxiliar) is not int:
@@ -229,7 +253,7 @@ def funEleicao():
                                     requests.post(listaServidores[0][0] + "/eleicao",
                                                   json={"id": dados["id"],
                                                         "participantes": participantes})
-                        else:  
+                        else:
                             print(info["identificacao"])
                             for servidor in listaServidores:
                                 cont += 1
@@ -243,7 +267,7 @@ def funEleicao():
                                         info["identificacao"])})
                                     return jsonify({"id": auxiliar + '-' + str(info["identificacao"])})
                     else:
-                        return jsonify({"id":"erro"}), 400
+                        return jsonify({"id": "erro"}), 400
                 else:
                     return jsonify({"id": "erro - tipo invalido"}), 400
             elif info["eleicao"] == "anel" and estado is True:
@@ -357,7 +381,7 @@ def reset():
 
 
 def main():
-    port = int(os.environ.get("PORT", 3001))
+    port = int(os.environ.get("PORT", 3002))
     app.run(host='0.0.0.0', port=port)
 
 
