@@ -102,19 +102,25 @@ def funInfo():
 @app.route('/recurso', methods=['GET', 'POST'])
 def funEstado():
     global verifica, operacao, auxiliar2, marcador
+    res = 0
     if request.method == 'GET':
         if info["lider"] == 1:
             if verifica is False:
                 return jsonify({"ocupado": verifica, "id_lider": info["identificacao"]}), 200
             elif verifica is True:
                 return jsonify({"ocupado": verifica, "id_lider": info["identificacao"]}), 409
-        elif print(info["lider"] == 0) and print(checkLider()) is True:
-            if verifica is False:
-                return jsonify({"ocupado": verifica, "id_lider": ID}), 200
-            elif verifica is True:
-                return jsonify({"ocupado": verifica, "id_lider": ID}), 409
         else:
-            return jsonify({"erro": "não existe lider"}), 400
+            for servidor in info["servidores_conhecidos"]:
+                res = checkLider(servidor["url"])
+                if res == 1:
+                    break
+            if info["lider"] == 0 and res == 1:
+                if verifica is False:
+                    return jsonify({"ocupado": verifica, "id_lider": ID}), 200
+                elif verifica is True:
+                    return jsonify({"ocupado": verifica, "id_lider": ID}), 409
+            else:
+                return jsonify({"erro": "não existe lider"}), 400
     elif request.method == 'POST':
         if info["lider"] == 1:
             if verifica is False:
@@ -124,20 +130,25 @@ def funEstado():
             elif verifica is True:
                 operacao = 409
             return jsonify({"ocupado": verifica}), operacao
-        elif info["lider"] == 0 and checkLider() is True:
-            operacao = 200
-            for servidor in info["servidores_conhecidos"]:
-                funcRecurso(servidor["url"])
-            if operacao == 200 and marcador == 0:
-                verifica = True
-                marcador = 1
-                requests.post(auxiliar2 + '/recurso')
-                threading.Thread(target=respFunc, args=()).start()
-            elif marcador == 1:
-                operacao = 409
-            return jsonify({"ocupado": verifica}), operacao
         else:
-            return jsonify({"erro": "não existe lider"}), 400
+            for servidor in info["servidores_conhecidos"]:
+                res = checkLider(servidor["url"])
+                if res == 1:
+                    break
+            if info["lider"] == 0 and res == 1:
+                operacao = 200
+                for servidor in info["servidores_conhecidos"]:
+                    funcRecurso(servidor["url"])
+                if operacao == 200 and marcador == 0:
+                    verifica = True
+                    marcador = 1
+                    requests.post(auxiliar2 + '/recurso')
+                    threading.Thread(target=respFunc, args=()).start()
+                elif marcador == 1:
+                    operacao = 409
+                return jsonify({"ocupado": verifica}), operacao
+            else:
+                return jsonify({"erro": "não existe lider"}), 400
 
 
 def funcRecurso(url):
@@ -160,25 +171,17 @@ def funcRecurso(url):
         pass
 
 
-def checkLider():
+def checkLider(url):
     global ID
     cont = 0
     try:
-        for servidor in info["servidores_conhecidos"]:
-            print(servidor)
-            print(servidor["url"])
-            dados = requests.get(servidor["url"] + '/info').json()
-            print(dados)
-            if dados is None:
-                pass
-            elif print(int(dados["lider"]) == 1) or (dados["lider"] is True):
-                cont = 1
-                ID = dados["identificacao"]
-                break
-        if cont == 1:
-            return True
-        else:
-            return False
+        dados = requests.get(url + '/info').json()
+        if dados is None:
+            pass
+        elif int(dados["lider"]) == 1 or dados["lider"] is True:
+            cont = 1
+            ID = dados["identificacao"]
+        return cont
     except requests.ConnectionError:
         pass
     except KeyError:
