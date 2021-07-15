@@ -6,10 +6,8 @@ import time
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
-
 ServidoresValidos = []
 eleicao = "valentao"
-participantes = []
 competicao = True
 verifica = False
 auxiliar2 = ""
@@ -249,6 +247,7 @@ def funEleicao():
                         ServidoresValidos = []
                         for servidor in info["servidores_conhecidos"]:
                             valentao(servidor["url"])
+                            time.sleep(2)
                         if competicao is False:
                             requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                           json={"coordenador": info["identificacao"],
@@ -269,12 +268,11 @@ def funEleicao():
                             cont += 1
                             if servidor[1] > info["identificacao"]:
                                 requests.post(servidor[0] + '/eleicao', json={"id": auxiliar + '-'
-                                                                                    + str(info["identificacao"])})
+                                                                              + str(info["identificacao"])})
                                 return jsonify({"id": auxiliar})
                             elif len(listaServidores) == cont:
                                 requests.post(listaServidores[0][0] + '/eleicao', json={"id": auxiliar + '-'
-                                                                                              + str(
-                                    info["identificacao"])})
+                                                                                        + str(info["identificacao"])})
                                 return jsonify({"id": auxiliar})
                     else:
                         return jsonify({"id": "erro"}), 400
@@ -299,12 +297,17 @@ def funEleicao():
                     return jsonify(dados)
                 else:
                     validacao.append(info["identificacao"])
+                    validacao = list(map(int, validacao))
                     validacao.sort()
+                    print(validacao)
                     for i in validacao:
                         cont += 1
                         if i > info["identificacao"]:
+                            print(lista)
                             for j in lista:
+                                print(j[1])
                                 if j[1] == i:
+                                    print(i)
                                     requests.post(j[0] + '/eleicao',
                                                   json={"id": str(dados) + '-' + str(info["identificacao"])})
                                 return jsonify({"id": dados + '-' + str(info["identificacao"])})
@@ -357,6 +360,7 @@ def reset():
 def main():
     port = int(os.environ.get("PORT", 3001))
     app.run(host='0.0.0.0', port=port)
-
+    
 
 main()
+
