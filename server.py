@@ -26,7 +26,7 @@ info = {
     "ponto_de_acesso": "https://sd-dmss.herokuapp.com",
     "status": "up",
     "identificacao": 7,
-    "lider": False,
+    "lider": 0,
     "eleicao": eleicao,
     "servidores_conhecidos": [
         {
@@ -79,7 +79,7 @@ def funInfo():
         except KeyError:
             pass
         try:
-            if type(dados["lider"]) == bool or dados["lider"] in [0, 1]:
+            if dados["lider"] in [0, 1]:
                 info["lider"] = dados["lider"]
         except KeyError:
             pass
@@ -99,12 +99,12 @@ def funInfo():
 def funEstado():
     global verifica, operacao, auxiliar2, marcador
     if request.method == 'GET':
-        if info["lider"] is True:
+        if info["lider"] == 1:
             if verifica is False:
                 return jsonify({"ocupado": verifica, "id_lider": info["identificacao"]}), 200
             elif verifica is True:
                 return jsonify({"ocupado": verifica, "id_lider": info["identificacao"]}), 409
-        elif info["lider"] is False and checkLider() is True:
+        elif info["lider"] == 0 and checkLider() is True:
             if verifica is False:
                 return jsonify({"ocupado": verifica, "id_lider": ID}), 200
             elif verifica is True:
@@ -112,7 +112,7 @@ def funEstado():
         else:
             return jsonify({"erro": "não existe lider"}), 400
     elif request.method == 'POST':
-        if info["lider"] is True:
+        if info["lider"] == 1:
             if verifica is False:
                 verifica = True
                 threading.Thread(target=respFunc, args=()).start()
@@ -120,7 +120,7 @@ def funEstado():
             elif verifica is True:
                 operacao = 409
             return jsonify({"ocupado": verifica, "id_lider": info["identificacao"]}), operacao
-        elif info["lider"] is False and checkLider() is True:
+        elif info["lider"] == 0 and checkLider() is True:
             for servidor in info["servidores_conhecidos"]:
                 funcRecurso(servidor["url"])
             if operacao == 200 and marcador == 0:
@@ -141,9 +141,9 @@ def funcRecurso(url):
         dados1 = requests.get(url + '/recurso')
         dados2 = dados1.json()
         aux = requests.get(url + '/info').json()
-        if dados2["ocupado"] is True and (aux["lider"] is not True or not int(aux["lider"]) == 1):
+        if dados2["ocupado"] is True and aux["lider"] == 0:
             operacao = 409
-        elif aux["lider"] is True or int(aux["lider"]) == 1:
+        elif aux["lider"] == 1:
             auxiliar2 = url
             ID = aux["identificacao"]
     except requests.ConnectionError:
@@ -157,27 +157,16 @@ def funcRecurso(url):
 def checkLider():
     global ID
     cont = 0
-    try:
-        for servidor in info["servidores_conhecidos"]:
-            dados = requests.get(servidor["url"] + '/info').json()
-            print(dados["lider"])
-            print(type(dados["lider"]))
-            print(dados["lider"] == 1)
-            print(int(dados["lider"]) == 1)
-            if dados["lider"] is True or int(dados["lider"]) == 1:
-                cont = 1
-                ID = dados["identificacao"]
-                break
-        if cont == 1:
-            return True
-        else:
-            return False
-    except requests.ConnectionError:
-        pass
-    except KeyError:
-        pass
-    except TypeError:
-        pass
+    for servidor in info["servidores_conhecidos"]:
+        dados = requests.get(servidor["url"] + '/info').json()
+        if dados["lider"] == 1:
+            cont = 1
+            ID = dados["identificacao"]
+            break
+    if cont == 1:
+        return True
+    else:
+        return False
 
 
 def respFunc():
@@ -321,9 +310,9 @@ def coord():
         dadosCoordenador["coordenador"] = dados["coordenador"]
         dadosCoordenador["id_eleicao"] = dados["id_eleicao"]
         if int(dadosCoordenador["coordenador"]) == info["identificacao"]:
-            info["lider"] = True
+            info["lider"] = 1
         else:
-            info["lider"] = False
+            info["lider"] = 0
         time.sleep(2)
         estado = False
         return jsonify(dadosCoordenador)
@@ -337,7 +326,7 @@ def reset():
     auxiliar = ""
     estado = False
     competicao = True
-    info["lider"] = False
+    info["lider"] = 0
     lista = []
     return jsonify(info, dadosCoordenador)
 
