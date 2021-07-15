@@ -171,7 +171,7 @@ def checkLider():
 def respFunc():
     global verifica, operacao, marcador
     time.sleep(20)
-    marcador = 1
+    marcador = 0
     operacao = 200
     verifica = False
 
