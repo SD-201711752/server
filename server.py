@@ -6,6 +6,7 @@ import time
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
+
 ServidoresValidos = []
 eleicao = "valentao"
 participantes = []
@@ -51,6 +52,7 @@ info = {
         }
     ]
 }
+
 dadosCoordenador = {
     "coordenador": "",
     "id_eleicao": "o id da eleição"
@@ -106,7 +108,7 @@ def funEstado():
                 return jsonify({"ocupado": verifica, "id_lider": info["identificacao"]}), 200
             elif verifica is True:
                 return jsonify({"ocupado": verifica, "id_lider": info["identificacao"]}), 409
-        elif info["lider"] == 0 and checkLider() is True:
+        elif print(info["lider"] == 0) and print(checkLider()) is True:
             if verifica is False:
                 return jsonify({"ocupado": verifica, "id_lider": ID}), 200
             elif verifica is True:
@@ -163,10 +165,13 @@ def checkLider():
     cont = 0
     try:
         for servidor in info["servidores_conhecidos"]:
+            print(servidor)
+            print(servidor["url"])
             dados = requests.get(servidor["url"] + '/info').json()
+            print(dados)
             if dados is None:
                 pass
-            elif int(dados["lider"]) == 1 or dados["lider"] is True:
+            elif print(int(dados["lider"]) == 1) or (dados["lider"] is True):
                 cont = 1
                 ID = dados["identificacao"]
                 break
