@@ -78,8 +78,11 @@ def funInfo():
         except KeyError:
             pass
         try:
-            if dados["lider"] in [0, 1]:
-                info["lider"] = dados["lider"]
+            if dados["lider"] in [0, 1] or dados["lider"] is True or dados["lider"] is False:
+                if dados["lider"] is False or int(dados["lider"]) == 0:
+                    info["lider"] = 0
+                elif dados["lider"] is True or int(dados["lider"]) == 1:
+                    info["lider"] = 1
         except KeyError:
             pass
         try:
@@ -118,7 +121,7 @@ def funEstado():
                 operacao = 200
             elif verifica is True:
                 operacao = 409
-            return jsonify({"ocupado": verifica, "id_lider": info["identificacao"]}), operacao
+            return jsonify({"ocupado": verifica}), operacao
         elif info["lider"] == 0 and checkLider() is True:
             operacao = 200
             for servidor in info["servidores_conhecidos"]:
@@ -130,7 +133,7 @@ def funEstado():
                 threading.Thread(target=respFunc, args=()).start()
             elif marcador == 1:
                 operacao = 409
-            return jsonify({"ocupado": verifica, "id_lider": ID}), operacao
+            return jsonify({"ocupado": verifica}), operacao
         else:
             return jsonify({"erro": "não existe lider"}), 400
 
@@ -140,9 +143,11 @@ def funcRecurso(url):
     try:
         dados1 = requests.get(url + '/recurso').json()
         aux = requests.get(url + '/info').json()
-        if dados1["ocupado"] is True and aux["lider"] == 0:
+        if dados1 is None or aux is None:
+            pass
+        elif dados1["ocupado"] is True and (int(aux["lider"]) == 0 or aux["lider"] is not True):
             operacao = 409
-        elif aux["lider"] == 1:
+        elif int(aux["lider"]) == 1 or aux["lider"] is True:
             auxiliar2 = url
             ID = aux["identificacao"]
     except requests.ConnectionError:
@@ -161,7 +166,7 @@ def checkLider():
             dados = requests.get(servidor["url"] + '/info').json()
             if dados is None:
                 pass
-            elif dados["lider"] == 1 or dados["lider"] is True:
+            elif int(dados["lider"]) == 1 or dados["lider"] is True:
                 cont = 1
                 ID = dados["identificacao"]
                 break
@@ -188,14 +193,15 @@ def respFunc():
 def valentao(url):
     global competicao, auxiliar, info, ServidoresValidos
     dados = requests.get(url + '/info').json()
-    print(info["identificacao"])
     try:
-        if dados["identificacao"] > info["identificacao"] and dados["status"] == "up" and dados[
-            "eleicao"] == "valentao":
-            competicao = True
-            requests.post(url + '/eleicao', json={"id": auxiliar})
-        if dados["status"] == "up" and dados["eleicao"] == "valentao":
-            ServidoresValidos.append(url)
+        if dados is None:
+            pass
+        else:
+            if dados["identificacao"] > info["identificacao"] and dados["status"] == "up" and dados["eleicao"] == "valentao":
+                competicao = True
+                requests.post(url + '/eleicao', json={"id": auxiliar})
+            if dados["status"] == "up" and dados["eleicao"] == "valentao":
+                ServidoresValidos.append(url)
     except TypeError:
         pass
 
@@ -204,7 +210,9 @@ def anel(url):
     global lista
     try:
         dados = requests.get(url + "/info").json()
-        if dados["status"] == "down" or dados["eleicao"] == "valentao":
+        if dados is None:
+            pass
+        elif dados["status"] == "down" or dados["eleicao"] == "valentao":
             pass
         else:
             lista.append((url, dados["identificacao"]))
@@ -233,7 +241,6 @@ def funEleicao():
                         ServidoresValidos = []
                         for servidor in info["servidores_conhecidos"]:
                             valentao(servidor["url"])
-                            time.sleep(2)
                         if competicao is False:
                             requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                           json={"coordenador": info["identificacao"],
