@@ -265,16 +265,19 @@ def funEleicao():
                             anel(servidor["url"])
                         lista.append((info["ponto_de_acesso"], info["identificacao"]))
                         listaServidores = sorted(lista, key=lambda x: x[1])
+                        print(listaServidores)
                         for servidor in listaServidores:
                             cont += 1
                             if servidor[1] > info["identificacao"]:
                                 requests.post(servidor[0] + '/eleicao', json={"id": auxiliar + '-'
                                                                               + str(info["identificacao"])})
-                                return jsonify({"id": auxiliar})
+                                return jsonify({"id": auxiliar + '-' + str(info["identificacao"])})
                             elif len(listaServidores) == cont:
+                                print(len(listaServidores))
+                                print(cont)
                                 requests.post(listaServidores[0][0] + '/eleicao', json={"id": auxiliar + '-'
                                                                                         + str(info["identificacao"])})
-                                return jsonify({"id": auxiliar})
+                                return jsonify({"id": auxiliar + '-' + str(info["identificacao"])})
                     else:
                         return jsonify({"id": "erro"}), 400
                 else:
