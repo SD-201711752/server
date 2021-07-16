@@ -286,6 +286,9 @@ def funEleicao():
                     validacao.append(i)
                 aux = list(map(int, validacao))
                 aux.sort()
+                print(aux)
+                print(validacao)
+                print(info["identificacao"] in aux)
                 if str(info["identificacao"]) in validacao:
                     requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                   json={"coordenador": aux[len(validacao) - 1],
