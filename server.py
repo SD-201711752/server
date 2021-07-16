@@ -289,13 +289,15 @@ def funEleicao():
                 print(aux)
                 print(validacao)
                 print(info["identificacao"] in aux)
+                print(lista)
                 if str(info["identificacao"]) in validacao:
                     requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                   json={"coordenador": aux[len(validacao) - 1],
                                         "id_eleicao": dados})
                     for i in lista:
+                        print(i[0])
                         requests.post(i[0] + '/eleicao/coordenador',
-                                      json={"coordenador": aux[len(lista) - 1],
+                                      json={"coordenador": aux[len(validacao) - 1],
                                             "id_eleicao": dados})
                     return jsonify(dados)
                 else:
@@ -314,8 +316,9 @@ def funEleicao():
                                     requests.post(j[0] + '/eleicao',
                                                   json={"id": str(dados) + '-' + str(info["identificacao"])})
                                 return jsonify({"id": dados + '-' + str(info["identificacao"])})
-                        elif cont == len(lista):
+                        elif cont == len(validacao):
                             for j in lista:
+                                print(j)
                                 if j[1] == validacao[0]:
                                     requests.post(j[0] + '/eleicao',
                                                   json={"id": str(dados) + '-' + str(info["identificacao"])})
