@@ -213,7 +213,7 @@ def valentao(url):
 
 
 def anel(url):
-    global lista
+    global lista, ServidoresValidos
     try:
         dados = requests.get(url + "/info").json()
         if dados is None:
@@ -222,6 +222,7 @@ def anel(url):
             pass
         else:
             lista.append((url, dados["identificacao"]))
+            ServidoresValidos.append((url, dados["identificacao"]))
             return
     except requests.ConnectionError:
         pass
@@ -259,9 +260,9 @@ def funEleicao():
                         estado = False
                     elif dadosEleicao["tipo_de_eleicao_ativa"] == "anel":
                         lista = []
+                        ServidoresValidos = []
                         for servidor in info["servidores_conhecidos"]:
                             anel(servidor["url"])
-                        ServidoresValidos = []
                         lista.append((info["ponto_de_acesso"], info["identificacao"]))
                         listaServidores = sorted(lista, key=lambda x: x[1])
                         for servidor in listaServidores:
@@ -286,15 +287,11 @@ def funEleicao():
                     validacao.append(i)
                 aux = list(map(int, validacao))
                 aux.sort()
-                print(aux)
-                print(validacao)
-                print(info["identificacao"] in aux)
-                print(lista)
-                if str(info["identificacao"]) in validacao:
+                if info["identificacao"] in aux:
                     requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                   json={"coordenador": aux[len(validacao) - 1],
                                         "id_eleicao": dados})
-                    for i in lista:
+                    for i in ServidoresValidos:
                         print(i[0])
                         requests.post(i[0] + '/eleicao/coordenador',
                                       json={"coordenador": aux[len(validacao) - 1],
@@ -308,21 +305,20 @@ def funEleicao():
                     for i in validacao:
                         cont += 1
                         if i > info["identificacao"]:
-                            print(lista)
-                            for j in lista:
+                            for j in ServidoresValidos:
                                 print(j[1])
-                                if j[1] == i:
+                                if int(j[1]) == i:
                                     print(i)
                                     requests.post(j[0] + '/eleicao',
                                                   json={"id": str(dados) + '-' + str(info["identificacao"])})
-                                return jsonify({"id": dados + '-' + str(info["identificacao"])})
+                                    return jsonify({"id": dados + '-' + str(info["identificacao"])})
                         elif cont == len(validacao):
-                            for j in lista:
+                            for j in ServidoresValidos:
                                 print(j)
                                 if j[1] == validacao[0]:
                                     requests.post(j[0] + '/eleicao',
                                                   json={"id": str(dados) + '-' + str(info["identificacao"])})
-                                return jsonify({"id": dados + '-' + str(info["identificacao"])})
+                                    return jsonify({"id": dados + '-' + str(info["identificacao"])})
         except KeyError:
             pass
         except TypeError:
@@ -352,14 +348,13 @@ def coord():
 
 @app.route('/reset', methods=['GET'])
 def reset():
-    global dadosCoordenador, info, estado, competicao, lista, auxiliar
+    global dadosCoordenador, info, estado, competicao, auxiliar
     dadosCoordenador["coordenador"] = ""
     dadosCoordenador["id_eleicao"] = ""
     auxiliar = ""
     estado = False
     competicao = True
     info["lider"] = 0
-    lista = []
     return jsonify(info, dadosCoordenador)
 
 
