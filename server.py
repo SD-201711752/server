@@ -275,6 +275,7 @@ def funEleicao():
                             elif len(listaServidores) == cont:
                                 print(len(listaServidores))
                                 print(cont)
+                                print(listaServidores[0][0])
                                 requests.post(listaServidores[0][0] + '/eleicao', json={"id": auxiliar + '-'
                                                                                         + str(info["identificacao"])})
                                 return jsonify({"id": auxiliar + '-' + str(info["identificacao"])})
@@ -290,6 +291,9 @@ def funEleicao():
                     validacao.append(i)
                 aux = list(map(int, validacao))
                 aux.sort()
+                print(aux)
+                print(validacao)
+                print(ServidoresValidos)
                 if info["identificacao"] in aux:
                     requests.post(info["ponto_de_acesso"] + '/eleicao/coordenador',
                                   json={"coordenador": aux[len(validacao) - 1],
