@@ -258,7 +258,7 @@ def funEleicao():
                                               json={"coordenador": info["identificacao"],
                                                     "id_eleicao": auxiliar})
                         estado = False
-                    elif dadosEleicao["tipo_de_eleicao_ativa"] == "anel":
+                    elif eleicao == "anel":
                         lista = []
                         ServidoresValidos = []
                         for servidor in info["servidores_conhecidos"]:
@@ -282,7 +282,7 @@ def funEleicao():
                         return jsonify({"id": "erro"}), 400
                 else:
                     return jsonify({"id": "erro - tipo invalido"}), 400
-            elif info["eleicao"] == "anel" and estado is True:
+            elif eleicao == "anel" and estado is True:
                 validacao = []
                 dados = request.json["id"]
                 id = dados.split("-")
